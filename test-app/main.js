@@ -1,9 +1,16 @@
 const fs = require('fs');
-const electron = require('electron');
-const logFile = 'K:\\Big Things\floating-ai\\electron-test.log';
-fs.writeFileSync(logFile, 'process.type in app: ' + process.type + '\n');
-fs.writeFileSync(logFile, 'typeof electron in app: ' + typeof electron + '\n', { flag: 'a' });
-fs.writeFileSync(logFile, 'keys of electron: ' + Object.keys(electron).join(', ') + '\n', { flag: 'a' });
-if (electron.app) {
-  electron.app.quit();
-}
+const path = require('path');
+const { app, BrowserWindow } = require('electron');
+
+const logFile = path.join(__dirname, '..', 'electron-test.log');
+
+app.whenReady().then(() => {
+  fs.writeFileSync(logFile, 'App ready\n');
+  const win = new BrowserWindow({ show: false, width: 200, height: 200 });
+  fs.appendFileSync(logFile, 'typeof win.getMediaSourceId: ' + typeof win.getMediaSourceId + '\n');
+  if (typeof win.getMediaSourceId === 'function') {
+    fs.appendFileSync(logFile, 'value: ' + win.getMediaSourceId() + '\n');
+  }
+  win.destroy();
+  app.quit();
+});
