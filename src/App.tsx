@@ -146,10 +146,10 @@ function FloatingAIWidget() {
     <main className="relative flex min-h-screen w-full flex-col justify-between bg-slate-100 p-6 text-slate-900 dark:bg-[#070A10] dark:text-slate-100">
       <div className="max-w-lg space-y-1.5">
         <h1 className="font-display text-base font-semibold tracking-tight">
-          Floating AI — Desktop Widget Preview
+          Vibha — Desktop Widget Preview
         </h1>
         <p className="text-xs leading-relaxed text-slate-600 dark:text-slate-400">
-          This web preview renders the Floating AI widget UI. Native Electron desktop features—always-on-top framing,{' '}
+          This web preview renders the Vibha widget UI. Native Electron desktop features—always-on-top framing,{' '}
           <span className="font-mono">safeStorage</span> DPAPI encryption, <span className="font-mono">desktopCapturer</span> screen capture,{' '}
           <span className="font-mono">Ctrl+Space</span> global hotkey, and main-process BYOK requests—execute in the Windows Electron runtime via{' '}
           <span className="font-mono text-sky-600 dark:text-sky-400">npm run dev:electron</span>.

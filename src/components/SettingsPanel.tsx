@@ -573,7 +573,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               <div className="flex justify-between">
                 <span className="text-slate-500">Application</span>
                 <span className="font-medium text-slate-900 dark:text-slate-100">
-                  Floating AI v{platform.appVersion}
+                  Vibha v{platform.appVersion}
                 </span>
               </div>
               <div className="flex justify-between">

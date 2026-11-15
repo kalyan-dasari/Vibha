@@ -109,7 +109,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   return (
     <div className="flex h-full w-full items-center justify-center p-2">
       <section
-        aria-label="Floating AI Chat Panel"
+        aria-label="Vibha Chat Panel"
         className="relative flex h-[550px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/96 text-slate-900 shadow-[0_18px_48px_rgba(2,6,23,0.22)] backdrop-blur-xl transition-opacity duration-150 dark:border-white/12 dark:bg-[#0B0F17]/95 dark:text-slate-100 dark:shadow-[0_20px_54px_rgba(0,0,0,0.62)]"
       >
         <ChatHeader
