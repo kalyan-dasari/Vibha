@@ -57,7 +57,7 @@ export class CaptureService {
 
     return sources
       .filter((src) => {
-        if (!src.name || src.name === 'Floating AI') return false;
+        if (!src.name || src.name === 'Vibha' || src.name === 'Floating AI') return false;
         if (widgetId && src.id === widgetId) return false;
         return !src.thumbnail.isEmpty();
       })

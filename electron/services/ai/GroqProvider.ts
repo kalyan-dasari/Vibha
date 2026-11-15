@@ -14,7 +14,7 @@ import {
 } from './AIProvider.ts';
 
 const SYSTEM_PROMPT =
-  'You are Floating AI, a concise, accurate, fast desktop assistant. Provide clear answers with clean Markdown and fenced code blocks when helpful.';
+  'You are Vibha, a concise, accurate, fast desktop assistant. Provide clear answers with clean Markdown and fenced code blocks when helpful.';
 
 export function inferGroqVisionSupport(modelId: string): boolean {
   const lower = modelId.toLowerCase();

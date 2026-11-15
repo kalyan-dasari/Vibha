@@ -70,7 +70,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="truncate font-display text-sm font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-              Floating AI
+              Vibha
             </h1>
             <span
               className={`h-1.5 w-1.5 shrink-0 rounded-full ${
