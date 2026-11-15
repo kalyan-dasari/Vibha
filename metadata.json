@@ -1,6 +1,6 @@
 {
-  "name": "Floating AI",
-  "description": "Lightweight always-on-top Windows desktop AI assistant with BYOK providers and screen capture.",
+  "name": "Vibha",
+  "description": "Vibha — Lightweight always-on-top Windows desktop AI assistant with BYOK providers and screen capture.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
