@@ -1,6 +1,6 @@
-appId: com.floatingai.desktop
-productName: Floating AI
-copyright: Copyright © 2026 Floating AI
+appId: com.vibha.desktop
+productName: Vibha
+copyright: Copyright © 2026 Vibha
 
 directories:
   output: release
@@ -30,8 +30,8 @@ nsis:
   allowToChangeInstallationDirectory: true
   createDesktopShortcut: true
   createStartMenuShortcut: true
-  shortcutName: Floating AI
-  uninstallDisplayName: Floating AI
+  shortcutName: Vibha
+  uninstallDisplayName: Vibha
   deleteAppDataOnUninstall: false
   installerIcon: resources/icons/icon.ico
   uninstallerIcon: resources/icons/icon.ico
