@@ -1,0 +1,110 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-sans);
+  }
+}
+
+/* Subtle custom scrollbar for compact chat window */
+.floating-scroll::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+.floating-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.floating-scroll::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.25);
+  border-radius: 9999px;
+}
+
+.floating-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.45);
+}
+
+/* Syntax highlighting tokens (highlight.js) for dark & light surfaces */
+.hljs {
+  background: transparent;
+  color: inherit;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-built_in {
+  color: #7dd3fc;
+}
+
+.dark .hljs-string,
+.dark .hljs-attr,
+.dark .hljs-template-tag {
+  color: #86efac;
+}
+
+.dark .hljs-number,
+.dark .hljs-literal,
+.dark .hljs-variable {
+  color: #fda4af;
+}
+
+.dark .hljs-title,
+.dark .hljs-function,
+.dark .hljs-section {
+  color: #c4b5fd;
+}
+
+.dark .hljs-comment,
+.dark .hljs-quote {
+  color: #64748b;
+  font-style: italic;
+}
+
+html:not(.dark) .hljs-keyword,
+html:not(.dark) .hljs-selector-tag,
+html:not(.dark) .hljs-built_in {
+  color: #0284c7;
+}
+
+html:not(.dark) .hljs-string,
+html:not(.dark) .hljs-attr {
+  color: #15803d;
+}
+
+html:not(.dark) .hljs-number,
+html:not(.dark) .hljs-literal {
+  color: #be123c;
+}
+
+html:not(.dark) .hljs-title,
+html:not(.dark) .hljs-function {
+  color: #6d28d9;
+}
+
+html:not(.dark) .hljs-comment,
+html:not(.dark) .hljs-quote {
+  color: #64748b;
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

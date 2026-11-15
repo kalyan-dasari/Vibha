@@ -1,0 +1,37 @@
+appId: com.floatingai.desktop
+productName: Floating AI
+copyright: Copyright © 2026 Floating AI
+
+directories:
+  output: release
+  buildResources: resources
+
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+  - "!**/.env*"
+  - "!**/tests/**"
+  - "!**/*.test.ts"
+
+asar: true
+
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+  icon: resources/icons/icon.ico
+  artifactName: "${productName}-Setup-${version}.${ext}"
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Floating AI
+  uninstallDisplayName: Floating AI
+  deleteAppDataOnUninstall: false
+  installerIcon: resources/icons/icon.ico
+  uninstallerIcon: resources/icons/icon.ico
