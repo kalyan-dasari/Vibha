@@ -81,7 +81,10 @@ The following features have been inspected, tested, and verified to be fully fun
    - **Solution:** Replace with a cross-platform rimraf/node clean command.
 3. **Vite Deprecated `__dirname` Warning (`vite.config.ts`)**:
    - **Problem:** `vite.config.ts` uses `path.resolve(__dirname, '.')`, triggering a warning in Vite 8.
-   - **Solution:** Use `import.meta.dirname` or file URL resolution.
+   - **Solution:** Switched to `import.meta.dirname`.
+4. **Hallucinated Groq Default Model (`meta-llama/llama-4-scout-17b-16e-instruct`)**:
+   - **Problem:** The imported project configured a non-existent model `meta-llama/llama-4-scout-17b-16e-instruct` which returned HTTP 404 `model_not_found` from Groq's API.
+   - **Solution:** Replaced with official Groq models: `llama-3.3-70b-versatile` (flagship text) and `llama-3.2-11b-vision-preview` / `llama-3.2-90b-vision-preview` (multimodal vision). Added an automatic migration in `settingsService.ts` to upgrade any existing saved configs on disk.
 
 ---
 

@@ -23,9 +23,9 @@ const FALLBACK_SETTINGS: AppSettings = {
     },
     groq: {
       provider: 'groq',
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: 'llama-3.3-70b-versatile',
       customBaseUrl: '',
-      customModelSupportsVision: true,
+      customModelSupportsVision: false,
     },
     'openai-compatible': {
       provider: 'openai-compatible',
@@ -105,14 +105,26 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     ],
     groq: [
       {
-        id: 'meta-llama/llama-4-scout-17b-16e-instruct',
-        name: 'Llama 4 Scout 17B (Vision)',
+        id: 'llama-3.3-70b-versatile',
+        name: 'Llama 3.3 70B Versatile (Flagship Text)',
+        provider: 'groq',
+        supportsVision: false,
+      },
+      {
+        id: 'llama-3.2-11b-vision-preview',
+        name: 'Llama 3.2 11B Vision (Multimodal & Screenshots)',
         provider: 'groq',
         supportsVision: true,
       },
       {
-        id: 'llama-3.3-70b-versatile',
-        name: 'Llama 3.3 70B Versatile (Text)',
+        id: 'llama-3.2-90b-vision-preview',
+        name: 'Llama 3.2 90B Vision (Large Multimodal)',
+        provider: 'groq',
+        supportsVision: true,
+      },
+      {
+        id: 'llama-3.1-8b-instant',
+        name: 'Llama 3.1 8B Instant (Ultra-fast)',
         provider: 'groq',
         supportsVision: false,
       },

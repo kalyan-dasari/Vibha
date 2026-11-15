@@ -20,8 +20,8 @@ export function inferGroqVisionSupport(modelId: string): boolean {
   const lower = modelId.toLowerCase();
   return (
     lower.includes('vision') ||
-    lower.includes('llama-4-scout') ||
-    lower.includes('llama-4-maverick')
+    lower.includes('llama-3.2-11b') ||
+    lower.includes('llama-3.2-90b')
   );
 }
 

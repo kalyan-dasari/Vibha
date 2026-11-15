@@ -19,9 +19,9 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     },
     groq: {
       provider: 'groq',
-      model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+      model: 'llama-3.3-70b-versatile',
       customBaseUrl: '',
-      customModelSupportsVision: true,
+      customModelSupportsVision: false,
     },
     'openai-compatible': {
       provider: 'openai-compatible',
@@ -80,7 +80,12 @@ export class SettingsService {
       const raw = fs.readFileSync(this.filePath, 'utf8');
       const parsed = JSON.parse(raw);
       const merged = sanitizePartialSettings(parsed, structuredClone(DEFAULT_APP_SETTINGS));
-      return merged.valid && merged.next ? merged.next : structuredClone(DEFAULT_APP_SETTINGS);
+      const settings = merged.valid && merged.next ? merged.next : structuredClone(DEFAULT_APP_SETTINGS);
+      if (settings.providers.groq.model.includes('llama-4-scout')) {
+        settings.providers.groq.model = 'llama-3.3-70b-versatile';
+        this.writeToDisk(settings);
+      }
+      return settings;
     } catch {
       return structuredClone(DEFAULT_APP_SETTINGS);
     }
