@@ -25,8 +25,8 @@ export const FloatingOrb: React.FC<FloatingOrbProps> = ({
     <div className="flex h-full w-full items-center justify-center p-2 select-none">
       <button
         type="button"
-        aria-label="Open Floating AI assistant"
-        title="Floating AI — Click to expand, drag to move (Ctrl+Space)"
+        aria-label="Open Vibha assistant"
+        title="Vibha — Click to expand, drag to move (Ctrl+Space)"
         onPointerDown={dragHandlers.onPointerDown}
         onPointerMove={dragHandlers.onPointerMove}
         onPointerUp={dragHandlers.onPointerUp}
