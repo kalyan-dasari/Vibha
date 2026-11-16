@@ -41,10 +41,19 @@ export function useSettings() {
     void reloadSnapshot();
     const bridge = getBridge();
     if (!bridge) return;
-    return bridge.window.onExpandedChange((isExpanded) => {
+    const unsubExpanded = bridge.window.onExpandedChange((isExpanded) => {
       setExpanded(isExpanded);
     });
-  }, [reloadSnapshot, setExpanded]);
+    const unsubOpenSettings = bridge.window.onOpenSettings?.(() => {
+      setExpanded(true);
+      setSettingsOpen(true);
+      setActiveTab('general');
+    });
+    return () => {
+      unsubExpanded();
+      unsubOpenSettings?.();
+    };
+  }, [reloadSnapshot, setActiveTab, setExpanded, setSettingsOpen]);
 
   const updateSettings = useCallback(
     async (partial: Partial<AppSettings>): Promise<{ ok: boolean; error?: string }> => {

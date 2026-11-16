@@ -9,6 +9,7 @@ import { CaptureService } from '../services/screen/captureService.ts';
 import { MonitorService } from '../services/screen/monitorService.ts';
 import { CredentialService } from '../services/security/credentialService.ts';
 import { SettingsService } from '../services/security/settingsService.ts';
+import { TrayService } from '../services/tray/trayService.ts';
 import { resolvePreloadPath } from '../windows/widgetWindow.ts';
 import { AppLifecycleManager } from './appLifecycle.ts';
 import { WindowManager } from './windowManager.ts';
@@ -88,7 +89,18 @@ function bootstrap(): void {
     });
     registerCaptureHandlers({ captureService, settingsService });
 
-    windowManager.initWidget();
+    const trayService = new TrayService({
+      windowManager,
+      onQuit: () => {
+        lifecycleManager.prepareQuit();
+        app.quit();
+      },
+    });
+    lifecycleManager.setTrayService(trayService);
+    trayService.initTray();
+
+    const isHiddenStartup = process.argv.includes('--hidden');
+    windowManager.initWidget({ startHidden: isHiddenStartup });
     lifecycleManager.registerGlobalShortcut(settings.globalShortcut);
     lifecycleManager.applyStartupBehavior(settings.launchOnStartup);
     lifecycleManager.registerPowerAndQuitHandlers();

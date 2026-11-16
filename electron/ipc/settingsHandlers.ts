@@ -9,14 +9,31 @@ import { isValidProviderId, validateEndpointUrl } from '../services/security/val
 
 export function buildSafeSnapshot(
   settingsService: SettingsService,
-  credentialService: CredentialService
+  credentialService: CredentialService,
+  lifecycleManager?: AppLifecycleManager
 ): SafeSettingsSnapshot {
+  const settings = settingsService.getSettings();
+  const shortcutStatus = lifecycleManager
+    ? lifecycleManager.getShortcutStatus()
+    : {
+        registered: true,
+        currentShortcut: settings.globalShortcut,
+        suggestedAlternatives: [
+          'CommandOrControl+Shift+Space',
+          'Alt+Space',
+          'CommandOrControl+Alt+Space',
+          'CommandOrControl+Shift+V',
+          'CommandOrControl+F12',
+        ],
+      };
+
   return {
-    settings: settingsService.getSettings(),
+    settings,
     credentials: credentialService.getAllSafeStatuses(),
+    shortcutStatus,
     platform: {
       os: `${process.platform} (${process.arch})`,
-      appVersion: app.getVersion(),
+      appVersion: typeof app?.getVersion === 'function' ? app.getVersion() : '1.0.0',
       electronVersion: process.versions.electron ?? 'unknown',
       encryptionAvailable: credentialService.isEncryptionAvailable(),
     },
@@ -39,7 +56,7 @@ export function registerSettingsHandlers(deps: {
   } = deps;
 
   ipcMain.handle('settings:get-snapshot', () => {
-    return buildSafeSnapshot(settingsService, credentialService);
+    return buildSafeSnapshot(settingsService, credentialService, lifecycleManager);
   });
 
   ipcMain.handle('settings:update', (_event, partial: unknown) => {
@@ -48,22 +65,18 @@ export function registerSettingsHandlers(deps: {
     if (!res.ok) {
       return {
         ok: false,
-        snapshot: buildSafeSnapshot(settingsService, credentialService),
+        snapshot: buildSafeSnapshot(settingsService, credentialService, lifecycleManager),
         error: res.error,
       };
     }
 
+    let shortcutError: string | undefined;
     if (res.settings.globalShortcut !== prev.globalShortcut) {
       const reg = lifecycleManager.registerGlobalShortcut(res.settings.globalShortcut);
       if (!reg.ok) {
-        // Revert shortcut setting if OS rejected registration
-        settingsService.updateSettings({ globalShortcut: prev.globalShortcut });
-        lifecycleManager.registerGlobalShortcut(prev.globalShortcut);
-        return {
-          ok: false,
-          snapshot: buildSafeSnapshot(settingsService, credentialService),
-          error: reg.error,
-        };
+        // We preserve the user's preferred shortcut in settingsService rather than silently reverting,
+        // while lifecycleManager marks the registration as unfulfilled with alternative suggestions.
+        shortcutError = reg.error;
       }
     }
 
@@ -76,8 +89,9 @@ export function registerSettingsHandlers(deps: {
     }
 
     return {
-      ok: true,
-      snapshot: buildSafeSnapshot(settingsService, credentialService),
+      ok: !shortcutError,
+      snapshot: buildSafeSnapshot(settingsService, credentialService, lifecycleManager),
+      error: shortcutError,
     };
   });
 

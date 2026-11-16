@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import {
+  AlertTriangle,
   ArrowLeft,
   CheckCircle2,
   Eye,
   EyeOff,
+  Keyboard,
   Loader2,
   RefreshCw,
   ShieldCheck,
@@ -63,9 +65,14 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
   );
   const [modelInput, setModelInput] = useState(settings.providers[settings.activeProvider].model);
   const [shortcutDraft, setShortcutDraft] = useState(settings.globalShortcut);
+  const [savingShortcut, setSavingShortcut] = useState(false);
   const [testing, setTesting] = useState(false);
   const [refreshingModels, setRefreshingModels] = useState(false);
   const [feedback, setFeedback] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    setShortcutDraft(settings.globalShortcut);
+  }, [settings.globalShortcut]);
 
   useEffect(() => {
     setModelInput(settings.providers[selectedProvider].model);
