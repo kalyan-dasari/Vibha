@@ -33,6 +33,7 @@ const floatingAIBridge: FloatingAIBridge = {
     getState: () => ipcRenderer.invoke('window:get-state'),
     onExpandedChange: (cb) => subscribe<boolean>('window:expanded-changed', cb),
     onFocusInput: (cb) => subscribe<void>('window:focus-input', () => cb()),
+    onOpenSettings: (cb) => subscribe<void>('window:open-settings', () => cb()),
   },
   chat: {
     sendMessageStream: (request: ChatStreamRequest) => ipcRenderer.invoke('chat:send-stream', request),

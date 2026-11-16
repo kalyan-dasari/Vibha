@@ -19,7 +19,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
     },
     groq: {
       provider: 'groq',
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       customBaseUrl: '',
       customModelSupportsVision: false,
     },
@@ -81,8 +81,11 @@ export class SettingsService {
       const parsed = JSON.parse(raw);
       const merged = sanitizePartialSettings(parsed, structuredClone(DEFAULT_APP_SETTINGS));
       const settings = merged.valid && merged.next ? merged.next : structuredClone(DEFAULT_APP_SETTINGS);
-      if (settings.providers.groq.model.includes('llama-4-scout')) {
-        settings.providers.groq.model = 'llama-3.3-70b-versatile';
+      if (
+        settings.providers.groq.model.includes('llama-4-scout') ||
+        settings.providers.groq.model === 'llama-3.3-70b-versatile'
+      ) {
+        settings.providers.groq.model = 'llama-3.1-8b-instant';
         this.writeToDisk(settings);
       }
       return settings;

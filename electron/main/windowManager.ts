@@ -21,20 +21,27 @@ export class WindowManager {
   private readonly rendererDevUrl?: string;
   private readonly rendererDistHtml: string;
   private readonly settingsService: SettingsService;
+  private isQuittingFn?: () => boolean;
 
   constructor(deps: {
     preloadPath: string;
     rendererDevUrl?: string;
     rendererDistHtml: string;
     settingsService: SettingsService;
+    isQuittingFn?: () => boolean;
   }) {
     this.preloadPath = deps.preloadPath;
     this.rendererDevUrl = deps.rendererDevUrl;
     this.rendererDistHtml = deps.rendererDistHtml;
     this.settingsService = deps.settingsService;
+    this.isQuittingFn = deps.isQuittingFn;
   }
 
-  initWidget(): BrowserWindow {
+  setIsQuittingCallback(fn: () => boolean): void {
+    this.isQuittingFn = fn;
+  }
+
+  initWidget(options?: { startHidden?: boolean }): BrowserWindow {
     if (this.widgetWindow && !this.widgetWindow.isDestroyed()) {
       return this.widgetWindow;
     }
@@ -50,6 +57,8 @@ export class WindowManager {
       rendererDistHtml: this.rendererDistHtml,
       hideFromTaskbar: settings.hideFromTaskbar,
       initialBounds: initialOrb,
+      startHidden: options?.startHidden ?? false,
+      isQuitting: () => (this.isQuittingFn ? this.isQuittingFn() : false),
     });
 
     this.widgetWindow.on('closed', () => {
@@ -190,6 +199,32 @@ export class WindowManager {
     this.clampCurrentWindowToNearestDisplay();
     win.show();
     this.setExpanded(true);
+  }
+
+  toggleVisibility(): void {
+    const win = this.getWidgetWindow();
+    if (!win) {
+      this.initWidget();
+      this.restoreOrExpand();
+      return;
+    }
+    if (win.isVisible()) {
+      this.hide();
+    } else {
+      this.restoreOrExpand();
+    }
+  }
+
+  openSettings(): void {
+    const win = this.getWidgetWindow();
+    if (!win) {
+      this.initWidget();
+    }
+    this.restoreOrExpand();
+    const activeWin = this.getWidgetWindow();
+    if (activeWin && !activeWin.isDestroyed()) {
+      activeWin.webContents.send('window:open-settings');
+    }
   }
 
   applyTaskbarVisibility(hideFromTaskbar: boolean): void {

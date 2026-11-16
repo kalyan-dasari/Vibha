@@ -123,18 +123,57 @@ export class GroqProvider implements AIProvider {
     return out;
   }
 
+  private async executeWithFallback<T>(
+    params: ProviderSendParams,
+    action: (targetModel: string) => Promise<T>
+  ): Promise<T> {
+    try {
+      return await action(params.model);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      const isNotFound =
+        (err as { status?: number })?.status === 404 ||
+        /model_not_found|does not exist|do not have access/i.test(msg);
+
+      if (!isNotFound) {
+        throw err;
+      }
+
+      // Dynamically discover models the user's BYOK key actually has access to
+      const models = await this.getModels().catch(() => []);
+      const hasImages = hasImageAttachments(params.messages);
+      const matching = models.filter((m) => !hasImages || m.supportsVision);
+
+      const fallback = matching.find((m) => m.id !== params.model)?.id;
+      if (fallback) {
+        params.model = fallback;
+        return await action(fallback);
+      }
+
+      const availableNames = models.map((m) => m.id).join(', ');
+      throw new Error(
+        `The model "${params.model}" is not available on your Groq account.${
+          availableNames ? ` Available models: ${availableNames}` : ''
+        }`
+      );
+    }
+  }
+
   async sendMessage(params: ProviderSendParams, signal?: AbortSignal): Promise<ProviderStreamResult> {
-    this.assertVisionIfNeeded(params);
-    const groq = this.createClient();
-    const completion = await groq.chat.completions.create(
-      {
-        model: params.model,
-        messages: this.buildMessages(params),
-        stream: false,
-      },
-      { signal }
-    );
-    return { fullText: completion.choices?.[0]?.message?.content ?? '' };
+    return this.executeWithFallback(params, async (model) => {
+      const sendParams = { ...params, model };
+      this.assertVisionIfNeeded(sendParams);
+      const groq = this.createClient();
+      const completion = await groq.chat.completions.create(
+        {
+          model,
+          messages: this.buildMessages(sendParams),
+          stream: false,
+        },
+        { signal }
+      );
+      return { fullText: completion.choices?.[0]?.message?.content ?? '' };
+    });
   }
 
   async streamResponse(
@@ -142,29 +181,32 @@ export class GroqProvider implements AIProvider {
     onChunk: (delta: string) => void,
     signal?: AbortSignal
   ): Promise<ProviderStreamResult> {
-    this.assertVisionIfNeeded(params);
-    const groq = this.createClient();
-    const stream = await groq.chat.completions.create(
-      {
-        model: params.model,
-        messages: this.buildMessages(params),
-        stream: true,
-      },
-      { signal }
-    );
+    return this.executeWithFallback(params, async (model) => {
+      const sendParams = { ...params, model };
+      this.assertVisionIfNeeded(sendParams);
+      const groq = this.createClient();
+      const stream = await groq.chat.completions.create(
+        {
+          model,
+          messages: this.buildMessages(sendParams),
+          stream: true,
+        },
+        { signal }
+      );
 
-    let fullText = '';
-    for await (const chunk of stream) {
-      if (signal?.aborted) {
-        throw new DOMException('Request cancelled by user.', 'AbortError');
+      let fullText = '';
+      for await (const chunk of stream) {
+        if (signal?.aborted) {
+          throw new DOMException('Request cancelled by user.', 'AbortError');
+        }
+        const delta = chunk.choices?.[0]?.delta?.content ?? '';
+        if (delta) {
+          fullText += delta;
+          onChunk(delta);
+        }
       }
-      const delta = chunk.choices?.[0]?.delta?.content ?? '';
-      if (delta) {
-        fullText += delta;
-        onChunk(delta);
-      }
-    }
-    return { fullText };
+      return { fullText };
+    });
   }
 
   async sendImageMessage(
