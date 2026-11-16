@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { AlertTriangle, X } from 'lucide-react';
 import type {
   AIModelInfo,
   AIProviderId,
@@ -110,7 +110,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
     <div className="flex h-full w-full items-center justify-center p-2">
       <section
         aria-label="Vibha Chat Panel"
-        className="relative flex h-[550px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/96 text-slate-900 shadow-[0_18px_48px_rgba(2,6,23,0.22)] backdrop-blur-xl transition-opacity duration-150 dark:border-white/12 dark:bg-[#0B0F17]/95 dark:text-slate-100 dark:shadow-[0_20px_54px_rgba(0,0,0,0.62)]"
+        className="relative flex h-[550px] w-[400px] flex-col overflow-hidden rounded-2xl border border-slate-200/90 bg-white/98 text-slate-900 shadow-[0_20px_50px_rgba(2,6,23,0.25)] backdrop-blur-2xl transition-all duration-200 dark:border-white/12 dark:bg-[#0B0F17]/96 dark:text-slate-100 dark:shadow-[0_22px_60px_rgba(0,0,0,0.7)]"
       >
         <ChatHeader
           activeProvider={activeProvider}
@@ -127,8 +127,11 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         />
 
         {bannerError && (
-          <div className="flex items-center justify-between gap-2 border-b border-rose-500/20 bg-rose-500/10 px-3.5 py-2 text-[11px] text-rose-700 dark:text-rose-300">
-            <span className="truncate">{bannerError}</span>
+          <div className="flex items-center justify-between gap-2 border-b border-rose-500/25 bg-rose-500/10 px-3.5 py-2 text-[11px] text-rose-700 dark:text-rose-300 animate-in fade-in duration-150">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <AlertTriangle className="h-3.5 w-3.5 shrink-0 text-rose-500" />
+              <span className="truncate">{bannerError}</span>
+            </div>
             <div className="flex shrink-0 items-center gap-1.5">
               {(bannerError.toLowerCase().includes('vision') ||
                 bannerError.toLowerCase().includes('screenshot')) && (
@@ -138,7 +141,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                     onChangeSettingsTab('providers');
                     if (!settingsOpen) onToggleSettings();
                   }}
-                  className="rounded bg-rose-600/20 px-1.5 py-0.5 text-[10px] font-semibold underline hover:bg-rose-600/30"
+                  className="rounded-md bg-rose-600/20 px-2 py-0.5 text-[10px] font-semibold text-rose-800 dark:text-rose-200 hover:bg-rose-600/30 transition-colors"
                 >
                   Switch Model
                 </button>
@@ -151,7 +154,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                   setAttachmentError(null);
                 }}
                 aria-label="Dismiss error"
-                className="shrink-0 rounded p-0.5 hover:bg-rose-500/20"
+                className="shrink-0 rounded-md p-0.5 hover:bg-rose-500/20 transition-colors"
               >
                 <X className="h-3.5 w-3.5" />
               </button>
@@ -186,9 +189,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               onRegenerate={onRegenerate}
               onOpenSettings={() => {
                 onChangeSettingsTab('providers');
-                onToggleSettings();
+                if (!settingsOpen) onToggleSettings();
               }}
               onOpenCapture={() => setCaptureMenuOpen(true)}
+              onQuickPrompt={(prompt) => {
+                void onSend(prompt);
+              }}
             />
 
             <ScreenshotPreview

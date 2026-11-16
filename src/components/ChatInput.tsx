@@ -80,8 +80,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   const canSend = !isStreaming && (text.trim().length > 0 || hasPendingAttachments);
 
   return (
-    <div className="border-t border-slate-200 p-3 dark:border-white/8">
-      <div className="flex items-end gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-2 focus-within:border-sky-500/60 dark:border-white/10 dark:bg-[#121721]">
+    <div className="border-t border-slate-200/80 bg-white/60 p-2.5 backdrop-blur-md dark:border-white/8 dark:bg-[#0B0F17]/70">
+      <div className="flex items-end gap-1.5 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-1.5 shadow-xs transition-all focus-within:border-sky-500/60 focus-within:ring-2 focus-within:ring-sky-500/10 dark:border-white/10 dark:bg-[#121822]">
         <input
           ref={fileInputRef}
           type="file"
@@ -91,51 +91,56 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onChange={handleFilesSelected}
         />
 
+        {/* Attachment button */}
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isStreaming}
-          title="Attach image"
+          title="Attach image (PNG, JPEG, WebP)"
           aria-label="Attach image"
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-200/70 hover:text-slate-900 disabled:opacity-40 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100"
+          className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-800 disabled:opacity-40 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100"
         >
           <Paperclip className="h-4 w-4" />
         </button>
 
+        {/* Screen Capture button */}
         <button
           type="button"
           onClick={onToggleCaptureMenu}
-          disabled={isStreaming}
-          title="Capture screen"
-          aria-label="Capture screen"
-          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg transition-colors disabled:opacity-40 ${
+          title="Screen capture modes (Area, Window, Fullscreen)"
+          aria-label="Screen capture"
+          className={`flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl transition-all ${
             captureMenuOpen
-              ? 'bg-sky-500/15 text-sky-600 dark:text-sky-400'
-              : 'text-slate-500 hover:bg-slate-200/70 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100'
+              ? 'bg-sky-500/20 text-sky-600 dark:text-sky-400 shadow-xs'
+              : 'text-slate-400 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100'
           }`}
         >
           <Camera className="h-4 w-4" />
         </button>
 
+        {/* Input Textarea */}
         <textarea
           ref={textareaRef}
-          rows={1}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder={
-            hasPendingAttachments ? 'Ask about this screenshot...' : 'Ask anything... (Shift+Enter for newline)'
+            hasPendingAttachments
+              ? 'Add message or press Enter to send...'
+              : 'Ask Vibha anything... (Enter to send)'
           }
-          className="floating-scroll max-h-[120px] min-h-[32px] flex-1 resize-none bg-transparent py-1.5 text-[13px] leading-snug text-slate-900 placeholder:text-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder:text-slate-500"
+          rows={1}
+          className="floating-scroll max-h-[110px] min-h-[26px] flex-1 resize-none bg-transparent py-1 text-xs leading-relaxed text-slate-900 placeholder-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder-slate-500"
         />
 
+        {/* Send / Stop button */}
         {isStreaming ? (
           <button
             type="button"
             onClick={onStop}
-            title="Stop generating"
-            aria-label="Stop generating"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-rose-500 text-white transition-colors hover:bg-rose-600"
+            title="Stop generation"
+            aria-label="Stop generation"
+            className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-rose-500 text-white shadow-xs shadow-rose-500/20 transition-all hover:bg-rose-600 active:scale-95"
           >
             <Square className="h-3.5 w-3.5 fill-current" />
           </button>
@@ -144,11 +149,11 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             type="button"
             onClick={() => void handleSubmit()}
             disabled={!canSend}
-            title="Send message (Enter)"
+            title="Send message"
             aria-label="Send message"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sky-600 text-white transition-colors hover:bg-sky-500 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-500 dark:disabled:bg-white/10 dark:disabled:text-slate-500"
+            className="flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-xs shadow-sky-500/20 transition-all hover:from-sky-400 hover:to-blue-500 active:scale-95 disabled:opacity-30 disabled:pointer-events-none"
           >
-            <ArrowUp className="h-4 w-4" />
+            <ArrowUp className="h-4 w-4 stroke-[2.5]" />
           </button>
         )}
       </div>

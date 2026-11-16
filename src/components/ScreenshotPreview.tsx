@@ -20,17 +20,17 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
 
   return (
     <>
-      <div className="border-t border-slate-200 bg-slate-50/70 px-3 py-2 dark:border-white/8 dark:bg-[#0D1118]/80">
+      <div className="border-t border-slate-200/80 bg-slate-50/80 px-3 py-2 backdrop-blur-md dark:border-white/8 dark:bg-[#0D1118]/80">
         <div className="floating-scroll flex items-center gap-2 overflow-x-auto pb-0.5">
           {attachments.map((att) => (
             <div
               key={att.id}
-              className="group relative flex shrink-0 items-center gap-2 rounded-lg border border-slate-200 bg-white p-1.5 pr-2 dark:border-white/10 dark:bg-[#151B25]"
+              className="group relative flex shrink-0 items-center gap-2 rounded-xl border border-slate-200/90 bg-white/95 p-1.5 pr-2.5 shadow-xs dark:border-white/10 dark:bg-[#151B25]"
             >
               <button
                 type="button"
                 onClick={() => setZoomed(att)}
-                className="relative h-10 w-14 overflow-hidden rounded border border-slate-200 dark:border-white/10"
+                className="relative h-10 w-14 overflow-hidden rounded-lg border border-slate-200/90 dark:border-white/10 shrink-0"
                 title="Inspect captured image"
               >
                 <img
@@ -44,7 +44,7 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
               </button>
 
               <div className="min-w-0">
-                <p className="max-w-[110px] truncate text-[11px] font-medium text-slate-800 dark:text-slate-200">
+                <p className="max-w-[110px] truncate text-[11px] font-semibold text-slate-800 dark:text-slate-200">
                   {att.name}
                 </p>
                 <p className="font-mono text-[10px] tabular-nums text-slate-500 dark:text-slate-400">
@@ -62,9 +62,9 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
                     }}
                     title="Recapture screenshot"
                     aria-label="Recapture screenshot"
-                    className="rounded p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-slate-100"
+                    className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-white/10 dark:hover:text-slate-100"
                   >
-                    <Camera className="h-3 w-3" />
+                    <Camera className="h-3.5 w-3.5" />
                   </button>
                 )}
                 <button
@@ -72,9 +72,9 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
                   onClick={() => onRemove(att.id)}
                   title="Remove attachment"
                   aria-label="Remove attachment"
-                  className="rounded p-1 text-slate-400 transition-colors hover:bg-rose-500/15 hover:text-rose-500"
+                  className="rounded-lg p-1 text-slate-400 transition-colors hover:bg-rose-500/15 hover:text-rose-500"
                 >
-                  <X className="h-3 w-3" />
+                  <X className="h-3.5 w-3.5" />
                 </button>
               </div>
             </div>
@@ -84,26 +84,32 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
 
       {zoomed && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-4 animate-in fade-in duration-150"
           onClick={() => setZoomed(null)}
         >
           <div
-            className="relative max-h-full max-w-full overflow-hidden rounded-xl border border-white/15 bg-slate-950 p-2"
+            className="relative max-h-full max-w-full overflow-hidden rounded-2xl border border-white/20 bg-slate-950 p-2 shadow-2xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setZoomed(null)}
               aria-label="Close preview"
-              className="absolute top-3 right-3 rounded-lg bg-black/70 p-1.5 text-white hover:bg-black"
+              className="absolute top-3 right-3 rounded-lg bg-black/70 p-1.5 text-white hover:bg-black transition-colors"
             >
               <X className="h-4 w-4" />
             </button>
             <img
               src={`data:${zoomed.mimeType};base64,${zoomed.base64Data}`}
               alt={zoomed.name}
-              className="max-h-[420px] max-w-full rounded-lg object-contain"
+              className="max-h-[80vh] max-w-[85vw] rounded-xl object-contain"
             />
+            <div className="mt-2 flex items-center justify-between px-2 text-[11px] text-slate-400 font-mono">
+              <span>{zoomed.name}</span>
+              <span>
+                {zoomed.width}×{zoomed.height} · {formatBytes(zoomed.sizeBytes)}
+              </span>
+            </div>
           </div>
         </div>
       )}

@@ -82,7 +82,7 @@ export const CaptureMenu: React.FC<CaptureMenuProps> = ({
 
   return (
     <div
-      className="absolute right-3 bottom-[68px] z-30 w-[268px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl dark:border-white/12 dark:bg-[#131923]"
+      className="absolute right-3 bottom-[64px] z-30 w-[270px] overflow-hidden rounded-2xl border border-slate-200/90 bg-white/98 shadow-2xl backdrop-blur-xl dark:border-white/12 dark:bg-[#131923]/98 animate-in fade-in zoom-in-95 duration-150"
       role="dialog"
       aria-label="Screen capture modes"
     >
