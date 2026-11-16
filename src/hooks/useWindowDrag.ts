@@ -30,13 +30,20 @@ export function useWindowDrag(options: UseWindowDragOptions = {}) {
 
   const onPointerDown = useCallback((e: React.PointerEvent<HTMLElement>) => {
     if (e.button !== 0) return;
-    // Ignore clicks on interactive buttons inside a draggable header
+    // Ignore clicks on interactive elements inside a draggable container (e.g. close buttons in header),
+    // but allow dragging if the element itself or its parent is the drag handle (like FloatingOrb).
     const target = e.target as HTMLElement;
-    if (target.closest('button, input, textarea, select, a, [data-no-drag="true"]')) {
+    const interactive = target.closest('button, input, textarea, select, a, [data-no-drag="true"]');
+    if (interactive && interactive !== e.currentTarget && !target.closest('[data-drag-handle="true"]')) {
       return;
     }
 
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // Safe catch if pointer capture is not supported
+    }
+
     dragStateRef.current = {
       active: true,
       startScreenX: e.screenX,
@@ -99,5 +106,6 @@ export function useWindowDrag(options: UseWindowDragOptions = {}) {
     onPointerDown,
     onPointerMove,
     onPointerUp,
+    onPointerCancel: onPointerUp,
   };
 }

@@ -27,10 +27,12 @@ export const FloatingOrb: React.FC<FloatingOrbProps> = ({
         type="button"
         aria-label="Open Vibha assistant"
         title="Vibha — Click to expand, drag to move (Ctrl+Space)"
+        data-drag-handle="true"
         onPointerDown={dragHandlers.onPointerDown}
         onPointerMove={dragHandlers.onPointerMove}
         onPointerUp={dragHandlers.onPointerUp}
-        className="group relative flex h-[60px] w-[60px] cursor-grab active:cursor-grabbing items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-900 shadow-[0_10px_28px_rgba(2,6,23,0.22)] transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.05] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-white/14 dark:bg-[#0D121B]/95 dark:text-slate-100 dark:shadow-[0_12px_32px_rgba(0,0,0,0.55)]"
+        onPointerCancel={dragHandlers.onPointerCancel}
+        className="group relative flex h-[60px] w-[60px] cursor-grab active:cursor-grabbing items-center justify-center rounded-full border border-slate-200/80 bg-white/95 text-slate-900 shadow-[0_10px_28px_rgba(2,6,23,0.22)] transition-transform duration-150 ease-[cubic-bezier(0.16,1,0.3,1)] hover:scale-[1.05] active:scale-[0.96] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-500 dark:border-white/14 dark:bg-[#0D121B]/95 dark:text-slate-100 dark:shadow-[0_12px_32px_rgba(0,0,0,0.55)] touch-none"
       >
         {/* Subtle concentric accent ring */}
         <span
