@@ -21,6 +21,7 @@ export class WindowManager {
   private readonly rendererDevUrl?: string;
   private readonly rendererDistHtml: string;
   private readonly settingsService: SettingsService;
+  private isQuittingFn?: () => boolean;
 
   constructor(deps: {
     preloadPath: string;
@@ -34,7 +35,11 @@ export class WindowManager {
     this.settingsService = deps.settingsService;
   }
 
-  initWidget(): BrowserWindow {
+  setIsQuittingCallback(fn: () => boolean): void {
+    this.isQuittingFn = fn;
+  }
+
+  initWidget(options?: { startHidden?: boolean }): BrowserWindow {
     if (this.widgetWindow && !this.widgetWindow.isDestroyed()) {
       return this.widgetWindow;
     }
@@ -50,6 +55,8 @@ export class WindowManager {
       rendererDistHtml: this.rendererDistHtml,
       hideFromTaskbar: settings.hideFromTaskbar,
       initialBounds: initialOrb,
+      startHidden: options?.startHidden ?? false,
+      isQuitting: () => (this.isQuittingFn ? this.isQuittingFn() : false),
     });
 
     this.widgetWindow.on('closed', () => {
