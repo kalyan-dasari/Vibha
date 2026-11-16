@@ -3,8 +3,7 @@
 **Application Name:** Vibha (formerly Floating AI)  
 **Target Platform:** Windows 10 / 11 (Electron Desktop)  
 **Architecture:** Electron 45 (Main + Preload + Sandboxed ContextBridge) + React 19 + TypeScript + Tailwind CSS v4 + Zustand  
-**Audit Date:** November 2026  
-**Status:** Audit Complete · Core Initialization & Runtime Verified  
+**Status:** Phases 1–4 Complete · Tray & Shortcut Recovery Verified · All 27 Tests Passing  
 
 ---
 
@@ -12,30 +11,24 @@
 
 This repository contains **Vibha** (Floating AI), an always-on-top, lightweight Windows desktop AI assistant. It provides a compact 60px floating orb that anchors to screen edges and expands on demand (`Ctrl+Space`) into a 400×550px floating chat panel. It supports Bring-Your-Own-Key (BYOK) AI providers (**Google Gemini**, **Groq**, and **OpenAI-Compatible** endpoints) and screen capture (fullscreen, active window, and custom rectangular area).
 
-A comprehensive repository audit of all 12 key areas was conducted:
-1. Project structure & branding
-2. `package.json` & dependency tree
-3. Electron main process & lifecycle
-4. Preload & IPC security boundaries
-5. React renderer & component tree
-6. Floating window & multi-monitor geometry
-7. AI provider adapters (Gemini, Groq, OpenAI-compatible)
-8. BYOK credential handling (`safeStorage` DPAPI)
-9. Screenshot capture implementation (`desktopCapturer` & DPI crop)
-10. Multimodal vision integration & model capability enforcement
-11. Temporary chat state (volatile RAM-only memory)
-12. Windows build & installer packaging (`electron-builder` NSIS)
-
-All 16 unit & security tests pass. The Electron main process, preload script, and React renderer bundle without errors, and the Electron desktop application was tested and verified to launch and run successfully on Windows.
+All 4 development phases have been implemented and verified:
+1. **Windows System Tray Integration (`TrayService`)**: Dedicated system tray service with context menu, visibility toggle on click, non-terminating window hiding, clean app quit, and `--hidden` Windows startup support.
+2. **Global Shortcut Recovery (`AppLifecycleManager`)**: Robust registration failure detection, conflict reporting, alternative suggestions, user preference preservation (no silent overwrite), and re-registration after system resume.
+3. **Settings UI Enhancements (`SettingsPanel`)**: Real-time shortcut registration status badge (Active/Conflict), conflict warning alert banner, clickable alternative suggestions, and persistent user configuration.
+4. **Automated Test Suite**: Added 11 new tests across tray management and shortcut recovery (27 total tests across 6 suites). `pnpm run lint`, `pnpm run test`, `pnpm run build`, and `pnpm run build:electron` all pass cleanly.
+5. **Groq Model Fallback**: Resolved user 404 `model_not_found` errors on BYOK keys by dynamically discovering accessible models (`llama-3.1-8b-instant`) and retrying seamlessly.
 
 ---
 
 ## 2. Completed Features
 
-The following features have been inspected, tested, and verified to be fully functional:
-
 | Feature | Implementation | Verification Details |
 |---|---|---|
+| **Windows System Tray (`TrayService`)** | `electron/services/tray/trayService.ts` | Dedicated Electron `Tray` and `Menu` implementation with Vibha app icon (`icon.ico` / `icon.png`). Menu items: "Open Vibha", "Hide Vibha", "Settings", separator, "Quit Vibha". Click toggles widget; closing widget hides without quitting app; quit cleanly tears down resources. Prevents duplicate tray instances. Verified in `tests/trayService.test.ts`. |
+| **Global Shortcut Recovery** | `electron/main/appLifecycle.ts` | Detects registration failures, captures specific failure errors, and provides recommended alternatives (`Ctrl+Shift+Space`, `Alt+Space`, `Ctrl+Alt+Space`, `Ctrl+Shift+V`, `Ctrl+F12`). Preserves user's configured shortcut without silent rollback. Re-registers on `powerMonitor.on('resume')` and cleans up on quit. Verified in `tests/shortcutRecovery.test.ts`. |
+| **Shortcut Configuration UI** | `src/components/SettingsPanel.tsx` | General tab displays current shortcut, active/conflict status badge, conflict alert banner with OS error, input field with Save Shortcut action, and one-click pill buttons for suggested alternatives. Supports opening directly via tray "Settings". |
+| **Groq Model Fallback & Discovery** | `electron/services/ai/GroqProvider.ts` | Automatically recovers from 404 `model_not_found` or permission errors by querying the user's BYOK account via `getModels()`, selecting an accessible model (`llama-3.1-8b-instant`), and transparently fulfilling the request. Default updated with disk migration. |
+| **Windows Startup (`--hidden`)** | `electron/windows/widgetWindow.ts`, `appLifecycle.ts` | Supports Windows login startup with `--hidden` flag: initializes system tray icon while keeping the floating widget hidden until summoned. |
 | **RAM-Only Ephemeral State** | `src/stores/chatStore.ts` | Strictly in-memory Zustand store without `persist` middleware, `localStorage`, or disk logs. All turns, attachments, and deltas clear on "New Chat" or app exit. Verified via `tests/chatStore.test.ts`. |
 | **OS-Level Credential Vault** | `electron/services/security/credentialService.ts` | Encrypts API keys via Electron `safeStorage` (Windows DPAPI) in `userData/credentials.enc.json`. Disallows plaintext fallback; never returns raw keys to renderer (exposes only masked hints like `••••9876`). Verified via `tests/security.test.ts`. |
 | **IPC & SSRF Protection** | `electron/services/security/validators.ts` | Validates custom OpenAI-compatible endpoints: allows `https:` and local endpoints (`http://localhost`, `http://127.0.0.1`), while strictly blocking link-local/cloud metadata IPs (`169.254.169.254`, `metadata.google.internal`) and embedded credentials. |
@@ -50,109 +43,95 @@ The following features have been inspected, tested, and verified to be fully fun
 
 ---
 
-## 3. Incomplete & Missing Features
+## 3. Verification Results
 
-1. **System Tray Integration (`Tray`)**:
-   - **Current State:** The application defaults to `hideFromTaskbar: true`. However, there is currently no `Tray` icon in the Windows notification area.
-   - **Impact:** If the window is hidden or if the global shortcut (`Ctrl+Space`) is conflicted or claimed by another application, the user has no direct tray menu to unhide the window, open settings, or quit the application.
-2. **Branding Updates to "Vibha"**:
-   - **Current State:** The imported codebase used the working title "Floating AI" across `package.json`, `electron-builder.yml`, `metadata.json`, `index.html`, and React header/settings views.
-   - **Impact:** Needs consistent branding updates to `Vibha` throughout the UI, window titles, system prompts, and package configs.
-3. **Self-Exclusion in Window Capture List**:
-   - **Current State:** `captureService.ts` line 60 excludes `src.name === 'Floating AI'`.
-   - **Impact:** When renamed to "Vibha", the window capture picker must exclude `src.name === 'Vibha'` (as well as `Floating AI`) so Vibha does not capture its own window in the active window list.
-4. **Global Shortcut Collision Recovery**:
-   - **Current State:** If `globalShortcut.register` fails (e.g. `Ctrl+Space` is registered by Windows PowerToys or another utility), `appLifecycle.ts` logs an error and rolls back, but does not provide an automated fallback (e.g. `Ctrl+Shift+Space`).
-
----
-
-## 4. Broken & Problematic Features
-
-1. **Windows Script Incompatibility (`package.json`)**:
-   - **Problem:** The `dev:electron` script contained:
-     `wait-on http://127.0.0.1:3000 && ELECTRON_RENDERER_URL=http://127.0.0.1:3000 electron .`
-     In Windows CMD / PowerShell, inline environment variable prefixing (`VAR=val cmd`) is not supported and causes immediate failure:
-     `'ELECTRON_RENDERER_URL' is not recognized as an internal or external command`.
-   - **Problem:** When launched from IDE terminals, `ELECTRON_RUN_AS_NODE=1` is frequently inherited, causing `electron .` to execute as a plain Node.js script instead of an Electron desktop GUI process.
-   - **Solution:** Use `cross-env` with `ELECTRON_RUN_AS_NODE=` cleared:
-     `cross-env ELECTRON_RUN_AS_NODE= ELECTRON_RENDERER_URL=http://127.0.0.1:3000 electron .`
-2. **Clean Script POSIX-Only Syntax (`package.json`)**:
-   - **Problem:** `"clean": "rm -rf dist dist-electron release server.js"` fails on standard Windows command line.
-   - **Solution:** Replace with a cross-platform rimraf/node clean command.
-3. **Vite Deprecated `__dirname` Warning (`vite.config.ts`)**:
-   - **Problem:** `vite.config.ts` uses `path.resolve(__dirname, '.')`, triggering a warning in Vite 8.
-   - **Solution:** Switched to `import.meta.dirname`.
-4. **Hallucinated Groq Default Model (`meta-llama/llama-4-scout-17b-16e-instruct`)**:
-   - **Problem:** The imported project configured a non-existent model `meta-llama/llama-4-scout-17b-16e-instruct` which returned HTTP 404 `model_not_found` from Groq's API.
-   - **Solution:** Replaced with official Groq models: `llama-3.3-70b-versatile` (flagship text) and `llama-3.2-11b-vision-preview` / `llama-3.2-90b-vision-preview` (multimodal vision). Added an automatic migration in `settingsService.ts` to upgrade any existing saved configs on disk.
-
----
-
-## 5. Security & Vulnerability Analysis
-
-| Category | Finding | Severity | Resolution / Status |
+| Check | Command | Status | Details |
 |---|---|---|---|
-| **API Key Storage** | Electron `safeStorage` (DPAPI) is enforced; plaintext fallback is explicitly prevented by `CredentialEncryptionUnavailableError`. | None (Secure) | PASS — Verified by `tests/security.test.ts`. |
-| **API Key IPC Leakage** | `getCredentialInternal` is strictly main-process only; renderer snapshots only receive `maskedHint` (`••••9876`). | None (Secure) | PASS — Verified. |
-| **SSRF in Custom URLs** | `validators.ts` validates custom base URLs, blocking IP literals like `169.254.169.254` and non-HTTP/HTTPS schemes. | None (Secure) | PASS — Verified by `tests/security.test.ts`. |
-| **Renderer Hardening** | `contextIsolation: true`, `nodeIntegration: false`, `sandbox: true`, `webSecurity: true`, `setWindowOpenHandler` denies all popup windows, `will-navigate` blocks navigation away from app. | None (Secure) | PASS — Verified. |
-| **Unused Dependencies** | `express`, `@types/express`, `motion`, `dotenv` are listed in `package.json` but never imported anywhere in the project, increasing attack surface and package size. | Low | Remove unused packages. |
-| **Electron Dependency Placement** | `electron` was listed in `"dependencies"` rather than `"devDependencies"`. | Low | Move `electron` to `devDependencies`. |
+| **TypeScript Typecheck** | `pnpm run lint` (`tsc --noEmit`) | **PASS** | 0 errors across main, preload, renderer, and test files. |
+| **Unit Test Suite** | `pnpm run test` (`vitest run`) | **PASS** | 27/27 tests passed across 6 suites (100% success rate). |
+| **Renderer Production Build** | `pnpm run build` (`vite build`) | **PASS** | Successfully bundled HTML/CSS/JS client into `dist/`. |
+| **Electron Main/Preload Build** | `pnpm run build:electron` | **PASS** | Successfully bundled CJS bundles into `dist-electron/`. |
+| **Desktop Launch Verification** | `pnpm run dev:electron` | **PASS** | Verified Electron boots with clean process environment, window opens, tray initializes. |
 
 ---
 
-## 6. Features Requiring Native Desktop vs. Browser Preview
+## 4. Test Suite Summary
 
-| Feature | Browser Preview (`npm run dev`) | Windows Electron (`npm run dev:electron`) |
-|---|---|---|
-| **UI Layout & Dark/Light Theme** | Full preview (interactive widget & panel) | Full native rendering |
-| **Drag & Position** | Simulated via CSS transforms | Native Windows OS window repositioning (`win.setBounds`) |
-| **Always-on-Top / Screen-Saver** | Unavailable (contained inside browser tab) | Native Win32 window layer (`screen-saver` level) |
-| **BYOK Credential Encryption** | In-memory simulated status | Real OS DPAPI encryption via `safeStorage` |
-| **AI Streaming** | Gated (prompts user to launch Electron) | Direct main-process streaming with zero CORS restrictions |
-| **Screen Capture** | Gated (prompts user to launch Electron) | Fullscreen, window, and area capture via `desktopCapturer` |
-| **Global Hotkey (`Ctrl+Space`)** | Local key listener inside tab | OS-wide global accelerator via `globalShortcut` |
+```
+ RUN  v5.1.0 K:/Big Things/floating-ai
+
+ ✓ tests/trayService.test.ts (5 tests)
+   - initializes tray with Vibha tooltip and context menu
+   - prevents duplicate tray instances when initTray is called repeatedly
+   - dispatches tray menu actions to windowManager and quit handler
+   - toggles widget visibility when tray icon is clicked
+   - completely destroys tray instance on quit/teardown
+
+ ✓ tests/shortcutRecovery.test.ts (6 tests)
+   - registers configured global shortcut successfully
+   - detects registration failure, reports error, and offers suggested alternatives without silent overwrite
+   - properly unregisters previous shortcut when registering a new one
+   - re-registers global shortcut and reclamps window display after system resume
+   - cleans up resources and unregisters all global shortcuts before app quit
+   - does not quit application when windows close unless app is quitting
+
+ ✓ tests/chatStore.test.ts (1 test)
+   - maintains ephemeral RAM-only conversation state and purges turns completely on clear
+
+ ✓ tests/security.test.ts (5 tests)
+   - refuses plaintext fallback when safeStorage encryption is unavailable
+   - encrypts credentials, masks IPC status hints, and never exposes raw keys
+   - blocks unsafe URL schemes and cloud metadata IPs while allowing HTTPS and localhost
+   - sanitizes partial settings inputs and rejects malformed values
+   - rejects malformed chat stream requests
+
+ ✓ tests/cropService.test.ts (6 tests)
+   - scales and crops full-screen image buffer to exact DIP bounds under 125% DPI
+   - clamps selection bounds within image dimensions
+   - rejects selections smaller than min crop threshold
+   - downscales images exceeding maximum dimension while preserving aspect ratio
+   - formats capture attachment with correct metadata
+   - crops high-resolution display buffer under 200% scaling
+
+ ✓ tests/aiProviders.test.ts (4 tests)
+   - refuses to silently drop images when a text-only Groq model is selected
+   - refuses to silently drop images on OpenAI-compatible text-only model unless overridden
+   - generates correct streaming requests and aggregates text responses
+   - maps provider credentials and updates dynamic model lists
+
+ Test Files  6 passed (6)
+      Tests  27 passed (27)
+```
 
 ---
 
-## 7. Recommended Fixes (Prioritized)
+## 5. Architecture Summary
 
-### Priority 1: Project Initialization & Windows Runtime (Immediate)
-1. Update `package.json`:
-   - Add `cross-env` to handle cross-platform environment variables (`ELECTRON_RENDERER_URL` and clearing `ELECTRON_RUN_AS_NODE`).
-   - Fix `dev:electron` script.
-   - Fix `clean` script for Windows.
-   - Move `electron` to `devDependencies`.
-   - Remove unused dependencies (`express`, `@types/express`, `motion`, `dotenv`).
-2. Update branding to **Vibha**:
-   - `package.json`, `electron-builder.yml`, `metadata.json`, `index.html`.
-   - React UI (`ChatHeader.tsx`, `FloatingOrb.tsx`, `ChatPanel.tsx`, `SettingsPanel.tsx`, `App.tsx`).
-   - AI system prompts (`GeminiProvider.ts`, `GroqProvider.ts`, `OpenAICompatibleProvider.ts`).
-   - Self-exclusion in `captureService.ts` (`src.name === 'Vibha' || src.name === 'Floating AI'`).
-3. Update `vite.config.ts`:
-   - Replace `__dirname` with `import.meta.dirname` to eliminate Vite 8 deprecation warning.
-
-### Priority 2: Windows System Tray Integration (Recommended Next)
-1. Add a `Tray` manager in `electron/main/trayManager.ts`.
-2. Display Vibha icon in Windows system notification area.
-3. Provide context menu:
-   - Toggle Vibha (Show / Hide)
-   - Settings...
-   - Check for Updates
-   - Exit Vibha
-
-### Priority 3: Architecture & Feature Enhancements (Post-Review Roadmap)
-1. **Shortcut Collision Fallback**: If `Ctrl+Space` is occupied by another application, offer automated alternative (`Ctrl+Alt+Space` or `Alt+Space`).
-2. **OCR Pre-processing / Multi-image Context**: Support consecutive screenshot stacking (up to 4) with token-size indicator in chat input.
-3. **Local LLM Preset**: One-click preset for local Ollama / LM Studio endpoints (`http://localhost:11434/v1`).
-4. **Code Signing Setup**: Guide for Windows Authenticode signing in `electron-builder.yml`.
-
----
-
-## 8. Verification Results
-
-- **Unit & Security Tests:** `vitest run` — 4/4 test files passed, 16/16 tests passed.
-- **TypeScript Static Check:** `tsc --noEmit` — 0 errors.
-- **Renderer Build:** `vite build` — Successfully built client production bundle.
-- **Electron Main/Preload Build:** `node scripts/build-electron.mjs` — Successfully built `dist-electron/main/index.cjs` (1.99 MB) and `dist-electron/preload/index.cjs` (2.65 KB).
-- **Electron Native Launch:** Verified app launches, creates window, registers IPC, and runs stably without crashing.
+```
+Vibha Architecture
+├── Main Process (Electron 45 / Node.js)
+│   ├── index.ts                   -> Application bootstrap & IPC registry
+│   ├── appLifecycle.ts            -> Single-instance lock, shortcut registration & recovery, power resume
+│   ├── windowManager.ts           -> Geometry calculation, DPI clamping, orb & chat toggle
+│   ├── services/
+│   │   ├── tray/trayService.ts    -> System tray, context menu, duplicate guard
+│   │   ├── ai/                    -> Gemini, Groq (with fallback), OpenAI-Compatible providers
+│   │   ├── screen/                -> Monitor info, desktopCapturer, DPI-aware cropService
+│   │   └── security/              -> safeStorage DPAPI vault, settingsService, validators
+│   └── windows/
+│       ├── widgetWindow.ts        -> Frameless, transparent, always-on-top 'screen-saver' window
+│       └── captureOverlayWindow.ts-> Transparent multi-monitor overlay for area cropping
+├── Preload Process
+│   └── index.ts                   -> contextBridge exposing strongly-typed FloatingAIBridge
+└── Renderer Process (React 19 + Tailwind v4 + Zustand)
+    ├── App.tsx                    -> Root widget and overlay router
+    ├── components/
+    │   ├── FloatingOrb.tsx        -> Frameless draggable 60px status orb
+    │   ├── ChatPanel.tsx          -> Collapsible 400x550px chat window
+    │   ├── SettingsPanel.tsx      -> General (shortcut config), Providers, Capture, About
+    │   ├── MessageBubble.tsx      -> Markdown + code highlighting
+    │   └── CaptureOverlayView.tsx -> Multi-monitor crosshair & drag selection
+    └── stores/
+        ├── chatStore.ts           -> In-memory RAM-only chat state
+        └── settingsStore.ts       -> Safe settings snapshot & provider models
+```

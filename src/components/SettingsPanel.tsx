@@ -429,34 +429,122 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
               </div>
             </div>
 
-            <div>
-              <label className="mb-1 block font-medium text-slate-700 dark:text-slate-300">
-                Global Shortcut
-              </label>
-              <div className="flex gap-1.5">
-                <input
-                  type="text"
-                  value={shortcutDraft}
-                  onChange={(e) => setShortcutDraft(e.target.value)}
-                  className="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-mono text-[11px] text-slate-900 dark:border-white/10 dark:bg-[#0D121A] dark:text-slate-100"
-                />
-                <button
-                  type="button"
-                  onClick={async () => {
-                    const res = await onUpdateSettings({ globalShortcut: shortcutDraft });
-                    setFeedback({
-                      ok: res.ok,
-                      text: res.ok ? 'Global shortcut updated.' : res.error ?? 'Invalid shortcut.',
-                    });
-                  }}
-                  className="rounded-lg bg-sky-600 px-3 py-1.5 text-[11px] font-medium text-white hover:bg-sky-500"
-                >
-                  Apply
-                </button>
+            {/* Global Shortcut Configuration Section */}
+            <div className="rounded-xl border border-slate-200 bg-slate-50/70 p-3 dark:border-white/8 dark:bg-white/2">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Keyboard className="h-3.5 w-3.5 text-slate-500 dark:text-slate-400" />
+                  <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                    Global Shortcut
+                  </span>
+                </div>
+                {snapshot.shortcutStatus?.registered ? (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-medium text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 className="h-3 w-3" />
+                    Active
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 px-2 py-0.5 text-[10px] font-medium text-amber-600 dark:text-amber-400">
+                    <AlertTriangle className="h-3 w-3" />
+                    Conflict
+                  </span>
+                )}
               </div>
-              <p className="mt-1 text-[10px] text-slate-400">
-                Default: CommandOrControl+Space
-              </p>
+
+              {/* Conflict Warning Banner */}
+              {(!snapshot.shortcutStatus?.registered || snapshot.shortcutStatus?.error) && (
+                <div className="mb-2.5 flex items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-2 text-[11px] text-amber-700 dark:text-amber-300">
+                  <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
+                  <div>
+                    <div className="font-semibold">Shortcut Conflict / Unregistered</div>
+                    <div className="mt-0.5 opacity-90">
+                      {snapshot.shortcutStatus?.error ??
+                        `Shortcut "${snapshot.shortcutStatus?.currentShortcut ?? shortcutDraft}" could not be registered by the operating system.`}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-2.5">
+                <div>
+                  <div className="mb-1 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
+                    <span>Current Shortcut:</span>
+                    <span className="font-mono text-[10px] font-semibold text-slate-700 dark:text-slate-300">
+                      {snapshot.shortcutStatus?.currentShortcut || settings.globalShortcut}
+                    </span>
+                  </div>
+                  <div className="flex gap-1.5">
+                    <input
+                      type="text"
+                      value={shortcutDraft}
+                      onChange={(e) => setShortcutDraft(e.target.value)}
+                      placeholder="e.g. CommandOrControl+Space"
+                      className="flex-1 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-mono text-[11px] text-slate-900 focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-[#0D121A] dark:text-slate-100"
+                    />
+                    <button
+                      type="button"
+                      disabled={savingShortcut}
+                      onClick={async () => {
+                        setSavingShortcut(true);
+                        try {
+                          const res = await onUpdateSettings({ globalShortcut: shortcutDraft.trim() });
+                          setFeedback({
+                            ok: res.ok,
+                            text: res.ok
+                              ? 'Global shortcut updated.'
+                              : res.error ?? 'Shortcut registration conflict.',
+                          });
+                        } finally {
+                          setSavingShortcut(false);
+                        }
+                      }}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-sky-600 px-3 py-1.5 text-[11px] font-medium text-white transition hover:bg-sky-500 disabled:opacity-50"
+                    >
+                      {savingShortcut && <Loader2 className="h-3 w-3 animate-spin" />}
+                      Save Shortcut
+                    </button>
+                  </div>
+                  <p className="mt-1 text-[10px] text-slate-400 dark:text-slate-500">
+                    Format: CommandOrControl, Alt, Shift + Key
+                  </p>
+                </div>
+
+                {/* Suggested Alternatives */}
+                {(snapshot.shortcutStatus?.suggestedAlternatives?.length ?? 0) > 0 && (
+                  <div className="border-t border-slate-200/60 pt-2 dark:border-white/6">
+                    <div className="mb-1.5 text-[10px] font-medium text-slate-500 dark:text-slate-400">
+                      Suggested Alternatives:
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {snapshot.shortcutStatus.suggestedAlternatives.map((alt) => (
+                        <button
+                          key={alt}
+                          type="button"
+                          disabled={savingShortcut}
+                          onClick={async () => {
+                            setShortcutDraft(alt);
+                            setSavingShortcut(true);
+                            try {
+                              const res = await onUpdateSettings({ globalShortcut: alt });
+                              setFeedback({
+                                ok: res.ok,
+                                text: res.ok
+                                  ? `Switched shortcut to ${alt}.`
+                                  : res.error ?? 'Failed to register shortcut.',
+                              });
+                            } finally {
+                              setSavingShortcut(false);
+                            }
+                          }}
+                          className="rounded-md border border-slate-200 bg-white px-2 py-1 font-mono text-[10px] text-slate-600 transition hover:border-sky-500 hover:text-sky-600 dark:border-white/10 dark:bg-white/4 dark:text-slate-300 dark:hover:border-sky-400 dark:hover:text-sky-300"
+                        >
+                          {alt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div>
