@@ -42,6 +42,8 @@ All 4 development phases have been implemented and verified:
 | **Windows NSIS Build Target** | `electron-builder.yml`, `scripts/build-electron.mjs` | NSIS 64-bit installer definition with customizable installation directory, start menu & desktop shortcuts, multi-resolution icon generator (`resources/icons/icon.ico`), and offline builder support (`--config.electronDist`). |
 | **Vibha Icon & Multi-Resolution Assets** | `resources/icons/*`, `scripts/generate-ico.ps1` | High-res avatar (`icon.png`), standard vector source (`icon.svg`), and multi-resolution Windows ICO (`icon.ico` with 256, 128, 64, 48, 32, 16px). Built into floating orb UI, chat header, tray, and app executable. |
 | **Robust App Lifecycle Guard** | `electron/main/appLifecycle.ts` | Defensively invokes `windowManager.setIsQuittingCallback` to prevent main process uncaught exceptions, ensuring reliable bootstrap across all build states. |
+| **Redesigned Chat UI & Avatar Transition** | `src/components/MessageList.tsx`, `ChatHeader.tsx`, `MessageBubble.tsx`, `ChatInput.tsx` | Front-and-center Vibha avatar with ambient halo on empty state, instant fade-out to conversation thread on start, interactive starter pills (capture, explain, summarize, code), mini avatar on assistant turns, and glassmorphic controls. |
+| **BYOK Architecture & Local Setup Docs** | `README.md` | Comprehensive documentation covering Bring-Your-Own-Key model across Gemini, Groq, and OpenAI-compatible endpoints, local clone-and-run steps for others (`pnpm run dev:electron`), security architecture, and testing. |
 
 ---
 
