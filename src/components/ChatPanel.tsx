@@ -129,18 +129,33 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
         {bannerError && (
           <div className="flex items-center justify-between gap-2 border-b border-rose-500/20 bg-rose-500/10 px-3.5 py-2 text-[11px] text-rose-700 dark:text-rose-300">
             <span className="truncate">{bannerError}</span>
-            <button
-              type="button"
-              onClick={() => {
-                onClearError();
-                onClearCaptureError();
-                setAttachmentError(null);
-              }}
-              aria-label="Dismiss error"
-              className="shrink-0 rounded p-0.5 hover:bg-rose-500/20"
-            >
-              <X className="h-3.5 w-3.5" />
-            </button>
+            <div className="flex shrink-0 items-center gap-1.5">
+              {(bannerError.toLowerCase().includes('vision') ||
+                bannerError.toLowerCase().includes('screenshot')) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChangeSettingsTab('providers');
+                    if (!settingsOpen) onToggleSettings();
+                  }}
+                  className="rounded bg-rose-600/20 px-1.5 py-0.5 text-[10px] font-semibold underline hover:bg-rose-600/30"
+                >
+                  Switch Model
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  onClearError();
+                  onClearCaptureError();
+                  setAttachmentError(null);
+                }}
+                aria-label="Dismiss error"
+                className="shrink-0 rounded p-0.5 hover:bg-rose-500/20"
+              >
+                <X className="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         )}
 

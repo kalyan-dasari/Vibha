@@ -55,9 +55,21 @@ export function useChat() {
 
       const provider = snapshot.settings.activeProvider;
       const providerConfig = snapshot.settings.providers[provider];
-      const model = providerConfig.model;
+      let model = providerConfig.model;
       const requestId = crypto.randomUUID();
       const attachmentsToSend = [...pendingAttachments];
+
+      // Auto-route screenshot turns to a vision-capable model if current model is text-only
+      if (attachmentsToSend.length > 0) {
+        const availableModels = modelsByProvider[provider] ?? [];
+        const currentModelInfo = availableModels.find((m) => m.id === model);
+        if (currentModelInfo && !currentModelInfo.supportsVision) {
+          const visionModel = availableModels.find((m) => m.supportsVision);
+          if (visionModel) {
+            model = visionModel.id;
+          }
+        }
+      }
 
       beginTurn({
         userContent: content,

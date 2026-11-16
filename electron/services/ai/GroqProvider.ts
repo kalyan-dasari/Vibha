@@ -21,7 +21,9 @@ export function inferGroqVisionSupport(modelId: string): boolean {
   return (
     lower.includes('vision') ||
     lower.includes('llama-3.2-11b') ||
-    lower.includes('llama-3.2-90b')
+    lower.includes('llama-3.2-90b') ||
+    lower.includes('qwen') ||
+    lower.includes('multimodal')
   );
 }
 
@@ -127,9 +129,26 @@ export class GroqProvider implements AIProvider {
     params: ProviderSendParams,
     action: (targetModel: string) => Promise<T>
   ): Promise<T> {
+    const hasImages = hasImageAttachments(params.messages);
+    let targetModel = params.model;
+
+    // If request contains screenshots/images and the configured model is text-only,
+    // automatically find a vision-capable model on the user's Groq account!
+    if (hasImages && !inferGroqVisionSupport(targetModel) && !params.supportsVisionOverride) {
+      const models = await this.getModels().catch(() => []);
+      const visionModel = models.find((m) => m.supportsVision)?.id;
+      if (visionModel) {
+        targetModel = visionModel;
+      }
+    }
+
     try {
-      return await action(params.model);
+      return await action(targetModel);
     } catch (err: unknown) {
+      if (err instanceof VisionUnsupportedError) {
+        throw err;
+      }
+
       const msg = err instanceof Error ? err.message : String(err);
       const isNotFound =
         (err as { status?: number })?.status === 404 ||
@@ -141,18 +160,21 @@ export class GroqProvider implements AIProvider {
 
       // Dynamically discover models the user's BYOK key actually has access to
       const models = await this.getModels().catch(() => []);
-      const hasImages = hasImageAttachments(params.messages);
       const matching = models.filter((m) => !hasImages || m.supportsVision);
 
-      const fallback = matching.find((m) => m.id !== params.model)?.id;
+      const fallback = matching.find((m) => m.id !== targetModel)?.id;
       if (fallback) {
         params.model = fallback;
         return await action(fallback);
       }
 
+      if (hasImages) {
+        throw new VisionUnsupportedError(params.model, 'groq');
+      }
+
       const availableNames = models.map((m) => m.id).join(', ');
       throw new Error(
-        `The model "${params.model}" is not available on your Groq account.${
+        `The model "${targetModel}" is not available on your Groq account.${
           availableNames ? ` Available models: ${availableNames}` : ''
         }`
       );
