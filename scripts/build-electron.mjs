@@ -120,7 +120,14 @@ function generateAppIcons(iconsDir) {
 }
 
 async function build() {
-  generateAppIcons(path.resolve('resources/icons'));
+  const iconsDir = path.resolve('resources/icons');
+  const icoPath = path.join(iconsDir, 'icon.ico');
+  const pngPath = path.join(iconsDir, 'icon.png');
+
+  // Only auto-generate default placeholder icons if the user has not placed custom icon files
+  if (!fs.existsSync(icoPath) || !fs.existsSync(pngPath)) {
+    generateAppIcons(iconsDir);
+  }
 
   await Promise.all([
     esbuild.build({
