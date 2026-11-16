@@ -39,7 +39,9 @@ All 4 development phases have been implemented and verified:
 | **Electron Sandboxing** | `electron/windows/widgetWindow.ts`, `electron/preload/index.ts` | Context isolation enabled, nodeIntegration disabled, sandbox enabled, web security enabled, window opening denied, navigation restricted to bundle origin. |
 | **Frameless Floating Orb UI** | `src/components/FloatingOrb.tsx`, `useWindowDrag.ts` | Custom geometric SVG aperture icon, pointer-capture dragging (>4px movement threshold to avoid swallowing clicks), status ring animation (streaming, error, ready). |
 | **Markdown & Code Rendering** | `src/components/MessageBubble.tsx` | Markdown rendering with `remark-gfm` and syntax highlighting with `highlight.js` for both dark and light modes with one-click code copy. |
-| **Windows NSIS Build Target** | `electron-builder.yml`, `scripts/build-electron.mjs` | NSIS 64-bit installer definition with customizable installation directory, start menu & desktop shortcuts, and embedded icon generator (`resources/icons/icon.ico`). |
+| **Windows NSIS Build Target** | `electron-builder.yml`, `scripts/build-electron.mjs` | NSIS 64-bit installer definition with customizable installation directory, start menu & desktop shortcuts, multi-resolution icon generator (`resources/icons/icon.ico`), and offline builder support (`--config.electronDist`). |
+| **Vibha Icon & Multi-Resolution Assets** | `resources/icons/*`, `scripts/generate-ico.ps1` | High-res avatar (`icon.png`), standard vector source (`icon.svg`), and multi-resolution Windows ICO (`icon.ico` with 256, 128, 64, 48, 32, 16px). Built into floating orb UI, chat header, tray, and app executable. |
+| **Robust App Lifecycle Guard** | `electron/main/appLifecycle.ts` | Defensively invokes `windowManager.setIsQuittingCallback` to prevent main process uncaught exceptions, ensuring reliable bootstrap across all build states. |
 
 ---
 
