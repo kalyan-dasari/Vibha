@@ -11,6 +11,7 @@
     "dev:electron": "npm run build:electron && concurrently -k \"vite --port=3000 --host=127.0.0.1\" \"wait-on http://127.0.0.1:3000 && node scripts/dev-electron.mjs\"",
     "build": "vite build",
     "build:electron": "node scripts/build-electron.mjs",
+    "build:icon": "powershell -ExecutionPolicy Bypass -File scripts/generate-ico.ps1",
     "dist:win": "npm run build && npm run build:electron && electron-builder --win --config electron-builder.yml",
     "preview": "vite preview",
     "clean": "node -e \"['dist','dist-electron','release','server.js'].forEach(d=>{try{fs.rmSync(d,{recursive:true,force:true})}catch{}})\"",

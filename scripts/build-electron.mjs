@@ -124,8 +124,18 @@ async function build() {
   const icoPath = path.join(iconsDir, 'icon.ico');
   const pngPath = path.join(iconsDir, 'icon.png');
 
-  // Only auto-generate default placeholder icons if the user has not placed custom icon files
-  if (!fs.existsSync(icoPath) || !fs.existsSync(pngPath)) {
+  // If icon.png exists but icon.ico is missing on Windows, generate multi-resolution ICO from icon.png
+  if (fs.existsSync(pngPath) && !fs.existsSync(icoPath) && process.platform === 'win32') {
+    try {
+      const { spawnSync } = await import('node:child_process');
+      const psScript = path.resolve('scripts/generate-ico.ps1');
+      if (fs.existsSync(psScript)) {
+        spawnSync('powershell', ['-ExecutionPolicy', 'Bypass', '-File', psScript], { stdio: 'inherit' });
+      }
+    } catch {
+      generateAppIcons(iconsDir);
+    }
+  } else if (!fs.existsSync(icoPath) && !fs.existsSync(pngPath)) {
     generateAppIcons(iconsDir);
   }
 

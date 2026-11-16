@@ -1,4 +1,5 @@
 import React from 'react';
+import vibhaAvatar from '../../resources/icons/icon.png';
 import { useWindowDrag } from '../hooks/useWindowDrag.ts';
 
 interface FloatingOrbProps {
@@ -48,34 +49,12 @@ export const FloatingOrb: React.FC<FloatingOrbProps> = ({
           }`}
         />
 
-        {/* Custom geometric Floating AI aperture icon */}
-        <svg
-          width="26"
-          height="26"
-          viewBox="0 0 28 28"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="relative z-10 transition-transform duration-200 group-hover:scale-105"
-          aria-hidden="true"
-        >
-          <circle
-            cx="14"
-            cy="14"
-            r="10.5"
-            className="stroke-sky-500 dark:stroke-sky-400"
-            strokeWidth="1.75"
-            strokeDasharray="48 18"
-            strokeLinecap="round"
-          />
-          <circle
-            cx="14"
-            cy="14"
-            r="5"
-            className="fill-sky-500/15 stroke-slate-800 dark:fill-sky-400/20 dark:stroke-slate-100"
-            strokeWidth="1.75"
-          />
-          <circle cx="14" cy="14" r="2" className="fill-sky-500 dark:fill-sky-400" />
-        </svg>
+        {/* Primary Vibha Avatar image */}
+        <img
+          src={vibhaAvatar}
+          alt="Vibha"
+          className="relative z-10 h-10 w-10 rounded-full object-cover shadow-sm transition-transform duration-200 group-hover:scale-105 pointer-events-none select-none"
+        />
       </button>
     </div>
   );

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Minimize2, Minus, RotateCcw, Settings } from 'lucide-react';
+import vibhaAvatar from '../../resources/icons/icon.png';
 import { useWindowDrag } from '../hooks/useWindowDrag.ts';
 import type { AIProviderId } from '../types/index.ts';
 
@@ -53,19 +54,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       className="flex cursor-grab active:cursor-grabbing items-center justify-between gap-2 border-b border-slate-200 px-3.5 py-2.5 select-none dark:border-white/8 touch-none"
     >
       <div className="flex min-w-0 items-center gap-2.5">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5">
-          <svg width="16" height="16" viewBox="0 0 28 28" fill="none" aria-hidden="true">
-            <circle
-              cx="14"
-              cy="14"
-              r="10"
-              className="stroke-sky-500 dark:stroke-sky-400"
-              strokeWidth="2"
-              strokeDasharray="44 16"
-              strokeLinecap="round"
-            />
-            <circle cx="14" cy="14" r="3.5" className="fill-sky-500 dark:fill-sky-400" />
-          </svg>
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-50 dark:border-white/10 dark:bg-white/5">
+          <img src={vibhaAvatar} alt="Vibha" className="h-full w-full object-cover select-none pointer-events-none" />
         </div>
 
         <div className="min-w-0">

@@ -9,10 +9,15 @@ directories:
 files:
   - dist/**/*
   - dist-electron/**/*
+  - resources/icons/*
   - package.json
   - "!**/.env*"
   - "!**/tests/**"
   - "!**/*.test.ts"
+
+extraResources:
+  - from: resources/icons
+    to: resources/icons
 
 asar: true
 
