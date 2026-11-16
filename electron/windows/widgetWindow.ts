@@ -7,6 +7,8 @@ export interface WidgetWindowOptions {
   rendererDistHtml: string;
   hideFromTaskbar: boolean;
   initialBounds: { x: number; y: number; width: number; height: number };
+  startHidden?: boolean;
+  isQuitting?: () => boolean;
 }
 
 export function createWidgetWindow(opts: WidgetWindowOptions): BrowserWindow {
@@ -49,7 +51,17 @@ export function createWidgetWindow(opts: WidgetWindowOptions): BrowserWindow {
   }
 
   win.once('ready-to-show', () => {
-    win.showInactive();
+    if (!opts.startHidden) {
+      win.showInactive();
+    }
+  });
+
+  // Keep Vibha alive in system tray when user or system requests close
+  win.on('close', (event) => {
+    if (!opts.isQuitting?.()) {
+      event.preventDefault();
+      win.hide();
+    }
   });
 
   // Guard against accidental navigation outside the app bundle

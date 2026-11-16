@@ -23,7 +23,7 @@ const FALLBACK_SETTINGS: AppSettings = {
     },
     groq: {
       provider: 'groq',
-      model: 'llama-3.3-70b-versatile',
+      model: 'llama-3.1-8b-instant',
       customBaseUrl: '',
       customModelSupportsVision: false,
     },
@@ -52,6 +52,15 @@ const FALLBACK_SNAPSHOT: SafeSettingsSnapshot = {
       maskedHint: null,
       encryptionAvailable: false,
     },
+  },
+  shortcutStatus: {
+    registered: true,
+    currentShortcut: 'CommandOrControl+Space',
+    suggestedAlternatives: [
+      'CommandOrControl+Shift+Space',
+      'Alt+Space',
+      'CommandOrControl+Alt+Space',
+    ],
   },
   platform: {
     os: 'browser-preview',

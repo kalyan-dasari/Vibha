@@ -94,9 +94,17 @@ export interface AppSettings {
   };
 }
 
+export interface ShortcutStatus {
+  registered: boolean;
+  currentShortcut: string;
+  error?: string;
+  suggestedAlternatives: string[];
+}
+
 export interface SafeSettingsSnapshot {
   settings: AppSettings;
   credentials: Record<AIProviderId, ProviderCredentialStatus>;
+  shortcutStatus: ShortcutStatus;
   platform: {
     os: string;
     appVersion: string;
@@ -180,6 +188,7 @@ export interface FloatingAIBridge {
     getState: () => Promise<{ expanded: boolean }>;
     onExpandedChange: (cb: (expanded: boolean) => void) => () => void;
     onFocusInput: (cb: () => void) => () => void;
+    onOpenSettings: (cb: () => void) => () => void;
   };
   chat: {
     sendMessageStream: (request: ChatStreamRequest) => Promise<{ accepted: boolean; error?: string }>;
