@@ -360,6 +360,12 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
                 className="w-full rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 font-mono text-[11px] text-slate-900 focus:border-sky-500 focus:outline-none dark:border-white/10 dark:bg-[#0D121A] dark:text-slate-100"
               />
 
+              {selectedProvider === 'groq' && (
+                <p className="mt-1.5 text-[10px] text-slate-400 dark:text-slate-500">
+                  Tip: Vision models like <code className="text-sky-500">llama-3.2-11b-vision-preview</code> analyze screenshots. Vibha automatically routes screenshot prompts to an available vision model on your account.
+                </p>
+              )}
+
               {selectedProvider === 'openai-compatible' && (
                 <label className="mt-2 flex items-center gap-2 text-[11px] text-slate-600 dark:text-slate-300">
                   <input
