@@ -18,12 +18,17 @@ const SYSTEM_PROMPT =
 
 export function inferGroqVisionSupport(modelId: string): boolean {
   const lower = modelId.toLowerCase();
+  // Groq decommissioned Llama 3.2 vision preview models
+  if (lower.includes('llama-3.2-11b') || lower.includes('llama-3.2-90b')) {
+    return false;
+  }
   return (
-    lower.includes('vision') ||
-    lower.includes('llama-3.2-11b') ||
-    lower.includes('llama-3.2-90b') ||
     lower.includes('qwen') ||
-    lower.includes('multimodal')
+    lower.includes('muse') ||
+    lower.includes('vision') ||
+    lower.includes('multimodal') ||
+    lower.includes('scout') ||
+    lower.includes('llava')
   );
 }
 
@@ -72,7 +77,13 @@ export class GroqProvider implements AIProvider {
     const models: AIModelInfo[] = (list.data ?? [])
       .filter((m) => {
         const id = m.id.toLowerCase();
-        return !id.includes('whisper') && !id.includes('tts') && !id.includes('guard');
+        return (
+          !id.includes('whisper') &&
+          !id.includes('tts') &&
+          !id.includes('guard') &&
+          !id.includes('llama-3.2-11b') &&
+          !id.includes('llama-3.2-90b')
+        );
       })
       .map((m) => ({
         id: m.id,
@@ -150,11 +161,12 @@ export class GroqProvider implements AIProvider {
       }
 
       const msg = err instanceof Error ? err.message : String(err);
-      const isNotFound =
+      const isUnavailableOrDecommissioned =
         (err as { status?: number })?.status === 404 ||
-        /model_not_found|does not exist|do not have access/i.test(msg);
+        (err as { status?: number })?.status === 400 ||
+        /model_not_found|model_decommissioned|decommissioned|does not exist|do not have access|no longer supported|deprecated/i.test(msg);
 
-      if (!isNotFound) {
+      if (!isUnavailableOrDecommissioned) {
         throw err;
       }
 

@@ -114,26 +114,20 @@ export const useSettingsStore = create<SettingsState>((set) => ({
     ],
     groq: [
       {
-        id: 'llama-3.3-70b-versatile',
-        name: 'Llama 3.3 70B Versatile (Flagship Text)',
+        id: 'llama-3.1-8b-instant',
+        name: 'Llama 3.1 8B Instant (Ultra-fast Text)',
         provider: 'groq',
         supportsVision: false,
       },
       {
-        id: 'llama-3.2-11b-vision-preview',
-        name: 'Llama 3.2 11B Vision (Multimodal & Screenshots)',
+        id: 'qwen/qwen3.8-27b',
+        name: 'Qwen 3.8 27B (Multimodal Vision & Screenshots)',
         provider: 'groq',
         supportsVision: true,
       },
       {
-        id: 'llama-3.2-90b-vision-preview',
-        name: 'Llama 3.2 90B Vision (Large Multimodal)',
-        provider: 'groq',
-        supportsVision: true,
-      },
-      {
-        id: 'llama-3.1-8b-instant',
-        name: 'Llama 3.1 8B Instant (Ultra-fast)',
+        id: 'llama-3.3-70b-versatile',
+        name: 'Llama 3.3 70B Versatile (Flagship Text)',
         provider: 'groq',
         supportsVision: false,
       },

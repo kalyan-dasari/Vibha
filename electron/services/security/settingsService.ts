@@ -83,7 +83,9 @@ export class SettingsService {
       const settings = merged.valid && merged.next ? merged.next : structuredClone(DEFAULT_APP_SETTINGS);
       if (
         settings.providers.groq.model.includes('llama-4-scout') ||
-        settings.providers.groq.model === 'llama-3.3-70b-versatile'
+        settings.providers.groq.model === 'llama-3.3-70b-versatile' ||
+        settings.providers.groq.model.includes('llama-3.2-11b') ||
+        settings.providers.groq.model.includes('llama-3.2-90b')
       ) {
         settings.providers.groq.model = 'llama-3.1-8b-instant';
         this.writeToDisk(settings);

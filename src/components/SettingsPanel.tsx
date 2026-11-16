@@ -362,7 +362,7 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
 
               {selectedProvider === 'groq' && (
                 <p className="mt-1.5 text-[10px] text-slate-400 dark:text-slate-500">
-                  Tip: Vision models like <code className="text-sky-500">llama-3.2-11b-vision-preview</code> analyze screenshots. Vibha automatically routes screenshot prompts to an available vision model on your account.
+                  Tip: Vision models like <code className="text-sky-500">qwen/qwen3.8-27b</code> analyze screenshots. Vibha automatically routes screenshot prompts to an active vision model on your account.
                 </p>
               )}
 
