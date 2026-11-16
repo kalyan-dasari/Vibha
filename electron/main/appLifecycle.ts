@@ -37,7 +37,9 @@ export class AppLifecycleManager {
     this.configuredShortcut = deps.settingsService.getSettings().globalShortcut;
 
     // Connect quit callback to windowManager so window close events don't terminate app
-    this.windowManager.setIsQuittingCallback(() => this.isQuitting());
+    if (typeof this.windowManager?.setIsQuittingCallback === 'function') {
+      this.windowManager.setIsQuittingCallback(() => this.isQuitting());
+    }
   }
 
   setTrayService(trayService: TrayService): void {
