@@ -3,7 +3,7 @@
 **Application Name:** Vibha (formerly Floating AI)  
 **Target Platform:** Windows 10 / 11 (Electron Desktop)  
 **Architecture:** Electron 45 (Main + Preload + Sandboxed ContextBridge) + React 19 + TypeScript + Tailwind CSS v4 + Zustand  
-**Status:** Phases 1–4 Complete · Profile Vault (Phase 1) Implemented · All 31 Tests Passing  
+**Status:** Phases 1–4 Complete · Profile Vault (Phase 1 & Phase 2) Implemented · All 36 Tests Passing  
 
 ---
 
@@ -11,12 +11,15 @@
 
 This repository contains **Vibha** (Floating AI), an always-on-top, lightweight Windows desktop AI assistant. It provides a compact 60px floating orb that anchors to screen edges and expands on demand (`Ctrl+Space`) into a 400×550px floating chat panel. It supports Bring-Your-Own-Key (BYOK) AI providers (**Google Gemini**, **Groq**, and **OpenAI-Compatible** endpoints) and screen capture (fullscreen, active window, and custom rectangular area).
 
-All 4 development phases have been implemented and verified:
+All core development phases and the Application Vault are implemented and verified:
 1. **Windows System Tray Integration (`TrayService`)**: Dedicated system tray service with context menu, visibility toggle on click, non-terminating window hiding, clean app quit, and `--hidden` Windows startup support.
 2. **Global Shortcut Recovery (`AppLifecycleManager`)**: Robust registration failure detection, conflict reporting, alternative suggestions, user preference preservation (no silent overwrite), and re-registration after system resume.
 3. **Settings UI Enhancements (`SettingsPanel`)**: Real-time shortcut registration status badge (Active/Conflict), conflict warning alert banner, clickable alternative suggestions, and persistent user configuration.
-4. **Automated Test Suite**: Added 11 new tests across tray management and shortcut recovery (27 total tests across 6 suites). `pnpm run lint`, `pnpm run test`, `pnpm run build`, and `pnpm run build:electron` all pass cleanly.
+4. **Automated Test Suite**: 36 total tests across 8 suites. `pnpm run lint`, `pnpm run test`, `pnpm run build`, and `pnpm run build:electron` all pass cleanly with 0 errors.
 5. **Groq Model Fallback**: Resolved user 404 `model_not_found` errors on BYOK keys by dynamically discovering accessible models (`llama-3.1-8b-instant`) and retrying seamlessly.
+6. **Application Vault & Form Assistant (Phases 1 & 2)**:
+   - **Phase 1 (Vault Foundation)**: Local profile schema in `%APPDATA%/Vibha/profile.json` storing contact details, education, work experience, technical & soft skills, projects, application logistics (work authorization, notice period, salary expectations, relocation/remote preferences), and custom Q&A snippets/STAR narratives. Full 7-section editor in Settings.
+   - **Phase 2 (Quick Vault Drawer)**: Instant-access searchable drawer (`QuickSnippetDrawer`) inside the floating chat panel with 1-click clipboard copy (`[📋 Copy]`), insert into chat textarea (`[✍️ Insert]`), real-time search across all profile items, category filtering tabs, header icon, and empty-state starter pill.
 
 ---
 
@@ -44,6 +47,7 @@ All 4 development phases have been implemented and verified:
 | **Robust App Lifecycle Guard** | `electron/main/appLifecycle.ts` | Defensively invokes `windowManager.setIsQuittingCallback` to prevent main process uncaught exceptions, ensuring reliable bootstrap across all build states. |
 | **Redesigned Chat UI & Avatar Transition** | `src/components/MessageList.tsx`, `ChatHeader.tsx`, `MessageBubble.tsx`, `ChatInput.tsx` | Front-and-center Vibha avatar with ambient halo on empty state, instant fade-out to conversation thread on start, interactive starter pills (capture, explain, summarize, code), mini avatar on assistant turns, and glassmorphic controls. |
 | **Personal Profile & Application Vault (Phase 1)** | `electron/services/profile/*`, `src/components/profile/*` | Local-first profile vault in `userData/profile.json` storing contact info, work experience, education, skills, projects, application logistics (work auth, salary, notice period), and custom Q&A snippets with instant 1-click clipboard copying. |
+| **Quick Snippet Vault Drawer (Phase 2)** | `src/components/profile/QuickSnippetDrawer.tsx`, `ChatPanel.tsx`, `ChatHeader.tsx`, `MessageList.tsx`, `ChatInput.tsx` | Slide-in Quick Vault drawer accessible from header icon and empty-state pill. Provides real-time substring search across all profile items, category filtering tabs, 1-click clipboard copy (`[📋 Copy]`), insert into chat textarea (`[✍️ Insert]`), and direct navigation to Settings. Verified via `tests/quickSnippetDrawer.test.ts`. |
 | **BYOK Architecture & Local Setup Docs** | `README.md` | Comprehensive documentation covering Bring-Your-Own-Key model across Gemini, Groq, and OpenAI-compatible endpoints, local clone-and-run steps for others (`pnpm run dev:electron`), security architecture, and testing. |
 
 ---
@@ -53,7 +57,7 @@ All 4 development phases have been implemented and verified:
 | Check | Command | Status | Details |
 |---|---|---|---|
 | **TypeScript Typecheck** | `pnpm run lint` (`tsc --noEmit`) | **PASS** | 0 errors across main, preload, renderer, and test files. |
-| **Unit Test Suite** | `pnpm run test` (`vitest run`) | **PASS** | 31/31 tests passed across 7 suites (100% success rate). |
+| **Unit Test Suite** | `pnpm run test` (`vitest run`) | **PASS** | 36/36 tests passed across 8 suites (100% success rate). |
 | **Renderer Production Build** | `pnpm run build` (`vite build`) | **PASS** | Successfully bundled HTML/CSS/JS client into `dist/`. |
 | **Electron Main/Preload Build** | `pnpm run build:electron` | **PASS** | Successfully bundled CJS bundles into `dist-electron/`. |
 | **Desktop Launch Verification** | `pnpm run dev:electron` | **PASS** | Verified Electron boots with clean process environment, window opens, tray initializes. |
@@ -65,11 +69,18 @@ All 4 development phases have been implemented and verified:
 ```
  RUN  v5.1.0 K:/Big Things/floating-ai
 
+ ✓ tests/profileService.test.ts (4 tests)
+ ✓ tests/security.test.ts (5 tests)
+ ✓ tests/shortcutRecovery.test.ts (6 tests)
  ✓ tests/trayService.test.ts (5 tests)
-   - initializes tray with Vibha tooltip and context menu
-   - prevents duplicate tray instances when initTray is called repeatedly
-   - dispatches tray menu actions to windowManager and quit handler
-   - toggles widget visibility when tray icon is clicked
+ ✓ tests/cropService.test.ts (6 tests)
+ ✓ tests/chatStore.test.ts (1 test)
+ ✓ tests/quickSnippetDrawer.test.ts (5 tests)
+ ✓ tests/aiProviders.test.ts (4 tests)
+
+ Test Files  8 passed (8)
+      Tests  36 passed (36)
+```
    - completely destroys tray instance on quit/teardown
 
  ✓ tests/shortcutRecovery.test.ts (6 tests)

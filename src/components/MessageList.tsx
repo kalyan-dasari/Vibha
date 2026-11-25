@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Camera, KeyRound, Sparkles, Terminal, FileText } from 'lucide-react';
+import { Camera, ClipboardList, FileText, KeyRound, Sparkles, Terminal } from 'lucide-react';
 import vibhaAvatar from '../../resources/icons/icon.png';
 import type { AIProviderId, UIMessage } from '../types/index.ts';
 import { MessageBubble } from './MessageBubble.tsx';
@@ -14,6 +14,7 @@ interface MessageListProps {
   onRegenerate: (assistantMessageId: string) => void;
   onOpenSettings: () => void;
   onOpenCapture: () => void;
+  onOpenQuickVault?: () => void;
   onQuickPrompt?: (prompt: string) => void;
 }
 
@@ -27,6 +28,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   onRegenerate,
   onOpenSettings,
   onOpenCapture,
+  onOpenQuickVault,
   onQuickPrompt,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -94,6 +96,17 @@ export const MessageList: React.FC<MessageListProps> = ({
                 <Camera className="h-3.5 w-3.5 text-sky-500" />
                 <span>Capture Screen</span>
               </button>
+
+              {onOpenQuickVault && (
+                <button
+                  type="button"
+                  onClick={onOpenQuickVault}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200/90 bg-white/90 px-3 py-1.5 text-xs font-medium text-slate-700 shadow-sm transition-all hover:border-sky-500/40 hover:bg-slate-50 hover:text-sky-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-sky-400/40 dark:hover:bg-white/10 dark:hover:text-sky-300 active:scale-[0.97]"
+                >
+                  <ClipboardList className="h-3.5 w-3.5 text-blue-500" />
+                  <span>Application Vault</span>
+                </button>
+              )}
 
               {onQuickPrompt && (
                 <>
