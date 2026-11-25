@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-  <img src="https://img.shields.io/badge/Tests-27%2F27%20Passed-emerald" alt="Tests: 27/27 Passed" />
+  <img src="https://img.shields.io/badge/Tests-36%2F36%20Passed-emerald" alt="Tests: 36/36 Passed" />
 </p>
 
 ---
@@ -49,6 +49,11 @@ Vibha operates strictly on a **Bring Your Own Key (BYOK)** model. You use your o
   - Sits in the Windows system notification area with menu options: *Open Vibha*, *Hide Vibha*, *Settings*, and *Quit Vibha*.
   - Configurable global toggle shortcut (default: `Ctrl+Space`) with OS conflict detection, alternative shortcut recommendations, and auto-recovery after system resume.
   - Closing or hiding the window keeps Vibha running in the tray; quitting terminates all processes cleanly.
+- **Application Vault & Form Assistant (Personal Profile & Quick Snippets)**:
+  - **Local-First Profile Vault**: Safely stores your personal contact info, education, work history, skills, project links, job logistics (work authorization, notice period, salary expectations, relocation/remote preferences), and custom recurring Q&A / STAR answers in `%APPDATA%/Vibha/profile.json`.
+  - **Quick Vault Drawer**: Open instantly with 1-click via the header vault icon or empty-state pill without leaving the chat interface.
+  - **1-Click Copy for Job Forms**: Copy any stored field or narrative answer directly to your clipboard (`[📋 Copy]`) with animated checkmark feedback to paste into repetitive job applications or web forms.
+  - **Insert into Chat (`[✍️ Insert]`)**: Paste any snippet into your chat prompt with one click so Vibha can tailor and customize it for a specific role or company.
 
 ---
 

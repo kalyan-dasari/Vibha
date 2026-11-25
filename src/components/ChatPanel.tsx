@@ -19,6 +19,7 @@ import { ChatInput } from './ChatInput.tsx';
 import { MessageList } from './MessageList.tsx';
 import { ScreenshotPreview } from './ScreenshotPreview.tsx';
 import { SettingsPanel } from './SettingsPanel.tsx';
+import { QuickSnippetDrawer } from './profile/QuickSnippetDrawer.tsx';
 
 interface ChatPanelProps {
   snapshot: SafeSettingsSnapshot;
@@ -99,6 +100,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   onBrowserDragDelta,
 }) => {
   const [captureMenuOpen, setCaptureMenuOpen] = useState(false);
+  const [quickVaultOpen, setQuickVaultOpen] = useState(false);
+  const [insertedText, setInsertedText] = useState<string | null>(null);
   const [attachmentError, setAttachmentError] = useState<string | null>(null);
 
   const activeProvider = snapshot.settings.activeProvider;
@@ -118,8 +121,16 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
           isConfigured={isConfigured}
           isStreaming={isStreaming}
           settingsOpen={settingsOpen}
+          quickVaultOpen={quickVaultOpen}
           hasMessages={messages.length > 0}
-          onToggleSettings={onToggleSettings}
+          onToggleSettings={() => {
+            if (!settingsOpen) setQuickVaultOpen(false);
+            onToggleSettings();
+          }}
+          onToggleQuickVault={() => {
+            if (!quickVaultOpen && settingsOpen) onToggleSettings();
+            setQuickVaultOpen((prev) => !prev);
+          }}
           onNewChat={onNewChat}
           onMinimize={onMinimize}
           onCollapse={onCollapse}
@@ -192,6 +203,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                 if (!settingsOpen) onToggleSettings();
               }}
               onOpenCapture={() => setCaptureMenuOpen(true)}
+              onOpenQuickVault={() => setQuickVaultOpen(true)}
               onQuickPrompt={(prompt) => {
                 void onSend(prompt);
               }}
@@ -225,9 +237,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               onAttachmentError={(err) => setAttachmentError(err)}
               onSend={onSend}
               onStop={onStop}
+              insertedText={insertedText}
+              onClearInsertedText={() => setInsertedText(null)}
             />
           </>
         )}
+
+        <QuickSnippetDrawer
+          isOpen={quickVaultOpen}
+          onClose={() => setQuickVaultOpen(false)}
+          onOpenProfileSettings={() => {
+            setQuickVaultOpen(false);
+            onChangeSettingsTab('profile');
+            if (!settingsOpen) onToggleSettings();
+          }}
+          onInsertIntoChat={(text) => {
+            setInsertedText(text);
+          }}
+        />
       </section>
     </div>
   );
