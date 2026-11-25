@@ -1,5 +1,5 @@
 import React from 'react';
-import { Minimize2, Minus, RotateCcw, Settings, Sparkles } from 'lucide-react';
+import { ClipboardList, Minimize2, Minus, RotateCcw, Settings, Sparkles } from 'lucide-react';
 import vibhaAvatar from '../../resources/icons/icon.png';
 import { useWindowDrag } from '../hooks/useWindowDrag.ts';
 import type { AIProviderId } from '../types/index.ts';
@@ -10,8 +10,10 @@ interface ChatHeaderProps {
   isConfigured: boolean;
   isStreaming: boolean;
   settingsOpen: boolean;
+  quickVaultOpen?: boolean;
   hasMessages: boolean;
   onToggleSettings: () => void;
+  onToggleQuickVault?: () => void;
   onNewChat: () => void;
   onMinimize: () => void;
   onCollapse: () => void;
@@ -30,8 +32,10 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   isConfigured,
   isStreaming,
   settingsOpen,
+  quickVaultOpen,
   hasMessages,
   onToggleSettings,
+  onToggleQuickVault,
   onNewChat,
   onMinimize,
   onCollapse,
@@ -113,6 +117,22 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100"
           >
             <RotateCcw className="h-3.5 w-3.5" />
+          </button>
+        )}
+
+        {onToggleQuickVault && (
+          <button
+            type="button"
+            onClick={onToggleQuickVault}
+            title={quickVaultOpen ? 'Close application vault' : 'Application Vault & Snippets'}
+            aria-label={quickVaultOpen ? 'Close application vault' : 'Open application vault'}
+            className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+              quickVaultOpen
+                ? 'bg-sky-500/15 text-sky-600 dark:text-sky-400 font-semibold'
+                : 'text-slate-500 hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100'
+            }`}
+          >
+            <ClipboardList className="h-3.5 w-3.5" />
           </button>
         )}
 

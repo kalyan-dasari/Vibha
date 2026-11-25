@@ -13,6 +13,8 @@ interface ChatInputProps {
   onAttachmentError: (err: string) => void;
   onSend: (text: string) => Promise<boolean>;
   onStop: () => void;
+  insertedText?: string | null;
+  onClearInsertedText?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -24,10 +26,22 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onAttachmentError,
   onSend,
   onStop,
+  insertedText,
+  onClearInsertedText,
 }) => {
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (insertedText) {
+      setText((prev) => (prev ? `${prev}\n\n${insertedText}` : insertedText));
+      onClearInsertedText?.();
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 50);
+    }
+  }, [insertedText, onClearInsertedText]);
 
   useEffect(() => {
     const bridge = getBridge();
