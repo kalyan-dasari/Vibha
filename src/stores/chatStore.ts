@@ -9,7 +9,10 @@ interface ChatState {
   activeRequestId: string | null;
   activeAssistantMessageId: string | null;
   error: string | null;
+  formAssistantMode: boolean;
 
+  setFormAssistantMode: (active: boolean) => void;
+  toggleFormAssistantMode: () => void;
   addPendingAttachment: (attachment: ImageAttachment) => void;
   removePendingAttachment: (id: string) => void;
   clearPendingAttachments: () => void;
@@ -49,7 +52,10 @@ export const useChatStore = create<ChatState>((set, get) => ({
   activeRequestId: null,
   activeAssistantMessageId: null,
   error: null,
+  formAssistantMode: false,
 
+  setFormAssistantMode: (active) => set({ formAssistantMode: active }),
+  toggleFormAssistantMode: () => set((state) => ({ formAssistantMode: !state.formAssistantMode })),
   addPendingAttachment: (attachment) =>
     set((state) => ({
       pendingAttachments:

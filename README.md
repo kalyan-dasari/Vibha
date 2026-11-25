@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-  <img src="https://img.shields.io/badge/Tests-36%2F36%20Passed-emerald" alt="Tests: 36/36 Passed" />
+  <img src="https://img.shields.io/badge/Tests-41%2F41%20Passed-emerald" alt="Tests: 41/41 Passed" />
 </p>
 
 ---
@@ -49,11 +49,15 @@ Vibha operates strictly on a **Bring Your Own Key (BYOK)** model. You use your o
   - Sits in the Windows system notification area with menu options: *Open Vibha*, *Hide Vibha*, *Settings*, and *Quit Vibha*.
   - Configurable global toggle shortcut (default: `Ctrl+Space`) with OS conflict detection, alternative shortcut recommendations, and auto-recovery after system resume.
   - Closing or hiding the window keeps Vibha running in the tray; quitting terminates all processes cleanly.
-- **Application Vault & Form Assistant (Personal Profile & Quick Snippets)**:
+- **Application Vault & Form Assistant (Personal Profile, Snippets & Copilot)**:
   - **Local-First Profile Vault**: Safely stores your personal contact info, education, work history, skills, project links, job logistics (work authorization, notice period, salary expectations, relocation/remote preferences), and custom recurring Q&A / STAR answers in `%APPDATA%/Vibha/profile.json`.
   - **Quick Vault Drawer**: Open instantly with 1-click via the header vault icon or empty-state pill without leaving the chat interface.
   - **1-Click Copy for Job Forms**: Copy any stored field or narrative answer directly to your clipboard (`[📋 Copy]`) with animated checkmark feedback to paste into repetitive job applications or web forms.
   - **Insert into Chat (`[✍️ Insert]`)**: Paste any snippet into your chat prompt with one click so Vibha can tailor and customize it for a specific role or company.
+  - **Screen-to-Answer AI Copilot**: Capture any online form question on screen and click `[🎯 Answer with Profile]` to draft a tailored first-person answer synthesized directly from your verified background with zero hallucinated credentials.
+  - **Form Copilot Mode**: Toggle Form Copilot mode anytime to automatically cross-reference your career background and enforce strict adherence to detected character or word limits without conversational fluff.
+  - **Live Character & Word Counters**: Telemetry displayed on generated answers (`{chars} chars · {words} words`) so you immediately know if an answer fits within strict application field limits.
+  - **1-Click Refinement Actions**: Quickly adjust any drafted response with presets: `[⚡ Shorter]` (<100 words), `[📝 Detailed]` (add technical impact), `[💼 More Formal]` (executive tone), or `[⭐ STAR Format]` (Situation, Task, Action, Result).
 
 ---
 
