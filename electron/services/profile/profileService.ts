@@ -87,7 +87,9 @@ export function sanitizePersonalProfile(input: unknown, current: PersonalProfile
   const raw = input as Partial<PersonalProfile>;
 
   // Personal section
-  const rawPersonal = (raw.personal && typeof raw.personal === 'object') ? raw.personal : {};
+  const rawPersonal = (raw.personal && typeof raw.personal === 'object')
+    ? (raw.personal as Partial<ProfilePersonal>)
+    : {};
   const personal: ProfilePersonal = {
     fullName: sanitizeString(rawPersonal.fullName, current.personal.fullName),
     email: sanitizeString(rawPersonal.email, current.personal.email),
@@ -126,7 +128,9 @@ export function sanitizePersonalProfile(input: unknown, current: PersonalProfile
   }));
 
   // Skills
-  const rawSkills = (raw.skills && typeof raw.skills === 'object') ? raw.skills : {};
+  const rawSkills = (raw.skills && typeof raw.skills === 'object')
+    ? (raw.skills as Partial<ProfileSkills>)
+    : {};
   const skills: ProfileSkills = {
     technical: sanitizeStringArray(rawSkills.technical ?? current.skills.technical),
     frameworks: sanitizeStringArray(rawSkills.frameworks ?? current.skills.frameworks),
@@ -147,7 +151,9 @@ export function sanitizePersonalProfile(input: unknown, current: PersonalProfile
   }));
 
   // Logistics
-  const rawLogistics = (raw.logistics && typeof raw.logistics === 'object') ? raw.logistics : {};
+  const rawLogistics = (raw.logistics && typeof raw.logistics === 'object')
+    ? (raw.logistics as Partial<ProfileLogistics>)
+    : {};
   const logistics: ProfileLogistics = {
     workAuthorization: sanitizeString(rawLogistics.workAuthorization, current.logistics.workAuthorization),
     noticePeriod: sanitizeString(rawLogistics.noticePeriod, current.logistics.noticePeriod),
