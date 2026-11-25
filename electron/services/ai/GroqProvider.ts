@@ -106,7 +106,7 @@ export class GroqProvider implements AIProvider {
 
   private buildMessages(params: ProviderSendParams): Groq.Chat.Completions.ChatCompletionMessageParam[] {
     const out: Groq.Chat.Completions.ChatCompletionMessageParam[] = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: params.systemPrompt || SYSTEM_PROMPT },
     ];
 
     for (const msg of params.messages) {

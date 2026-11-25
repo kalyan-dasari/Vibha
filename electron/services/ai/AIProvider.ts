@@ -26,6 +26,7 @@ export interface ProviderSendParams {
   model: string;
   messages: ChatMessageInput[];
   supportsVisionOverride?: boolean;
+  systemPrompt?: string;
 }
 
 export interface ProviderStreamResult {
