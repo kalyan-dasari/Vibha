@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Camera, Maximize2, X } from 'lucide-react';
+import { Camera, Maximize2, Sparkles, X } from 'lucide-react';
 import { formatBytes } from '../services/imageService.ts';
 import type { ImageAttachment } from '../types/index.ts';
 
@@ -7,12 +7,14 @@ interface ScreenshotPreviewProps {
   attachments: ImageAttachment[];
   onRemove: (id: string) => void;
   onRecapture: () => void;
+  onAnswerWithProfile?: () => void;
 }
 
 export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
   attachments,
   onRemove,
   onRecapture,
+  onAnswerWithProfile,
 }) => {
   const [zoomed, setZoomed] = useState<ImageAttachment | null>(null);
 
@@ -21,6 +23,22 @@ export const ScreenshotPreview: React.FC<ScreenshotPreviewProps> = ({
   return (
     <>
       <div className="border-t border-slate-200/80 bg-slate-50/80 px-3 py-2 backdrop-blur-md dark:border-white/8 dark:bg-[#0D1118]/80">
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[10px] font-semibold tracking-wide text-slate-500 dark:text-slate-400 uppercase">
+            Captured Screen ({attachments.length})
+          </span>
+          {onAnswerWithProfile && (
+            <button
+              type="button"
+              onClick={onAnswerWithProfile}
+              title="Auto-draft an answer to the question in this screenshot using your profile"
+              className="inline-flex items-center gap-1 rounded-lg bg-gradient-to-r from-indigo-500 to-sky-600 px-2.5 py-0.5 text-[10px] font-semibold text-white shadow-xs hover:from-indigo-400 hover:to-sky-500 active:scale-95 transition-all"
+            >
+              <Sparkles className="h-2.5 w-2.5" />
+              <span>Answer with Profile</span>
+            </button>
+          )}
+        </div>
         <div className="floating-scroll flex items-center gap-2 overflow-x-auto pb-0.5">
           {attachments.map((att) => (
             <div

@@ -199,7 +199,7 @@ export class GeminiProvider implements AIProvider {
       model: params.model,
       contents: this.buildContents(params),
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: params.systemPrompt || SYSTEM_INSTRUCTION,
         abortSignal: signal,
       },
     });
@@ -218,7 +218,7 @@ export class GeminiProvider implements AIProvider {
       model: params.model,
       contents: this.buildContents(params),
       config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: params.systemPrompt || SYSTEM_INSTRUCTION,
         abortSignal: signal,
       },
     });
