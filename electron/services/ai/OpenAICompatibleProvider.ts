@@ -135,7 +135,7 @@ export class OpenAICompatibleProvider implements AIProvider {
 
   private buildMessages(params: ProviderSendParams) {
     const out: Array<{ role: 'system' | 'user' | 'assistant'; content: string | OpenAIMessagePart[] }> = [
-      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'system', content: params.systemPrompt || SYSTEM_PROMPT },
     ];
 
     for (const msg of params.messages) {

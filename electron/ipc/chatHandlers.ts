@@ -34,6 +34,7 @@ export function registerChatHandlers(deps: {
           model: req.model,
           messages: req.messages,
           supportsVisionOverride,
+          systemPrompt: req.systemPrompt,
         };
 
         const sendChunk = (delta: string) => {

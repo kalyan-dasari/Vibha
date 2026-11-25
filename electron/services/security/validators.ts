@@ -131,6 +131,10 @@ export function validateChatStreamRequest(payload: unknown): { valid: boolean; e
     }
   }
 
+  if (req.systemPrompt !== undefined && (typeof req.systemPrompt !== 'string' || req.systemPrompt.length > 50000)) {
+    return { valid: false, error: 'Invalid system prompt (must be string up to 50KB).' };
+  }
+
   return { valid: true, data: req as ChatStreamRequest };
 }
 
