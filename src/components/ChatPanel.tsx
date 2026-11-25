@@ -20,6 +20,7 @@ import { MessageList } from './MessageList.tsx';
 import { ScreenshotPreview } from './ScreenshotPreview.tsx';
 import { SettingsPanel } from './SettingsPanel.tsx';
 import { QuickSnippetDrawer } from './profile/QuickSnippetDrawer.tsx';
+import { MULTI_QUESTION_FORM_PROMPT } from '../services/profilePromptService.ts';
 
 interface ChatPanelProps {
   snapshot: SafeSettingsSnapshot;
@@ -205,6 +206,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               shortcut={snapshot.settings.globalShortcut}
               onRegenerate={onRegenerate}
               onRefine={onRefine}
+              onInsertAnswer={(ans) => setInsertedText(ans)}
               onOpenSettings={() => {
                 onChangeSettingsTab('providers');
                 if (!settingsOpen) onToggleSettings();
@@ -229,6 +231,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
                 void onSend(
                   'Answer the question shown in this form screenshot using my verified career and personal profile. Adhere strictly to any visible character or word limits.'
                 );
+              }}
+              onParseFullForm={() => {
+                if (!formAssistantActive) onToggleFormAssistant?.();
+                void onSend(MULTI_QUESTION_FORM_PROMPT);
               }}
             />
 
