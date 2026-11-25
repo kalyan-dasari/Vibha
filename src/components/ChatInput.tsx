@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowUp, Camera, Paperclip, Square } from 'lucide-react';
+import { ArrowUp, Camera, Paperclip, Sparkles, Square, X } from 'lucide-react';
 import { getBridge } from '../services/electronBridge.ts';
 import { processImageFile } from '../services/imageService.ts';
 import type { ImageAttachment } from '../types/index.ts';
@@ -15,6 +15,8 @@ interface ChatInputProps {
   onStop: () => void;
   insertedText?: string | null;
   onClearInsertedText?: () => void;
+  formAssistantActive?: boolean;
+  onToggleFormAssistant?: () => void;
 }
 
 export const ChatInput: React.FC<ChatInputProps> = ({
@@ -28,6 +30,8 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   onStop,
   insertedText,
   onClearInsertedText,
+  formAssistantActive,
+  onToggleFormAssistant,
 }) => {
   const [text, setText] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -95,6 +99,25 @@ export const ChatInput: React.FC<ChatInputProps> = ({
 
   return (
     <div className="border-t border-slate-200/80 bg-white/60 p-2.5 backdrop-blur-md dark:border-white/8 dark:bg-[#0B0F17]/70">
+      {formAssistantActive && (
+        <div className="mb-2 flex items-center justify-between rounded-xl bg-gradient-to-r from-indigo-500/10 via-sky-500/10 to-blue-500/10 px-2.5 py-1 text-[11px] font-medium text-indigo-700 dark:text-indigo-300 border border-indigo-500/20">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="flex h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+            <span className="truncate">Form Copilot Active · Cross-referencing Profile</span>
+          </div>
+          {onToggleFormAssistant && (
+            <button
+              type="button"
+              onClick={onToggleFormAssistant}
+              className="rounded p-0.5 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-700 dark:hover:text-indigo-200 transition-colors"
+              title="Disable Form Copilot"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          )}
+        </div>
+      )}
+
       <div className="flex items-end gap-1.5 rounded-2xl border border-slate-200/90 bg-white/95 px-2.5 py-1.5 shadow-xs transition-all focus-within:border-sky-500/60 focus-within:ring-2 focus-within:ring-sky-500/10 dark:border-white/10 dark:bg-[#121822]">
         <input
           ref={fileInputRef}
@@ -132,6 +155,27 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           <Camera className="h-4 w-4" />
         </button>
 
+        {/* Form Copilot Toggle button */}
+        {onToggleFormAssistant && (
+          <button
+            type="button"
+            onClick={onToggleFormAssistant}
+            title={
+              formAssistantActive
+                ? 'Form Copilot Active (Click to disable)'
+                : 'Form Copilot: Answer application questions using your profile'
+            }
+            aria-label="Form Copilot"
+            className={`flex h-7.5 w-7.5 shrink-0 items-center justify-center rounded-xl transition-all ${
+              formAssistantActive
+                ? 'bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 font-semibold shadow-xs'
+                : 'text-slate-400 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-100'
+            }`}
+          >
+            <Sparkles className={`h-4 w-4 ${formAssistantActive ? 'text-indigo-500' : ''}`} />
+          </button>
+        )}
+
         {/* Input Textarea */}
         <textarea
           ref={textareaRef}
@@ -140,8 +184,10 @@ export const ChatInput: React.FC<ChatInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={
             hasPendingAttachments
-              ? 'Add message or press Enter to send...'
-              : 'Ask Vibha anything... (Enter to send)'
+              ? 'Add instructions or press Enter to send...'
+              : formAssistantActive
+                ? 'Type or snip a form question (answers from profile)...'
+                : 'Ask Vibha anything... (Enter to send)'
           }
           rows={1}
           className="floating-scroll max-h-[110px] min-h-[26px] flex-1 resize-none bg-transparent py-1 text-xs leading-relaxed text-slate-900 placeholder-slate-400 focus:outline-none dark:text-slate-100 dark:placeholder-slate-500"

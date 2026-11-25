@@ -47,6 +47,7 @@ export interface ChatStreamRequest {
   model: string;
   messages: ChatMessageInput[];
   supportsVisionOverride?: boolean;
+  systemPrompt?: string;
 }
 
 export interface ChatStreamChunkEvent {

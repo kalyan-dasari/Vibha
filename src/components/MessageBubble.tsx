@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
 import hljs from 'highlight.js/lib/common';
-import { AlertCircle, Check, Copy, RefreshCw } from 'lucide-react';
+import { AlertCircle, Briefcase, Check, Copy, FileText, RefreshCw, Star, Zap } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import vibhaAvatar from '../../resources/icons/icon.png';
+import { countCharactersAndWords, REFINEMENT_PROMPTS } from '../services/profilePromptService.ts';
 import type { UIMessage } from '../types/index.ts';
 
 interface MessageBubbleProps {
@@ -11,6 +12,7 @@ interface MessageBubbleProps {
   isLastAssistant: boolean;
   isStreamingAny: boolean;
   onRegenerate: (assistantMessageId: string) => void;
+  onRefine?: (refinementPrompt: string) => void;
 }
 
 const CodeBlock: React.FC<{ className?: string; children?: React.ReactNode }> = ({
@@ -75,6 +77,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   isLastAssistant,
   isStreamingAny,
   onRegenerate,
+  onRefine,
 }) => {
   const [copiedMsg, setCopiedMsg] = useState(false);
 
@@ -190,31 +193,82 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
 
         {/* Message Actions */}
         {message.status !== 'streaming' && (
-          <div className="flex items-center gap-1.5 pl-1 text-[11px] text-slate-400 opacity-90 transition-opacity">
-            {message.content && (
-              <button
-                type="button"
-                onClick={handleCopyMessage}
-                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200"
-              >
-                {copiedMsg ? (
-                  <Check className="h-3 w-3 text-emerald-500" />
-                ) : (
-                  <Copy className="h-3 w-3" />
-                )}
-                <span>{copiedMsg ? 'Copied' : 'Copy'}</span>
-              </button>
-            )}
+          <div className="flex flex-col gap-1.5 pl-1 text-[11px] text-slate-400 opacity-90 transition-opacity">
+            <div className="flex items-center gap-2">
+              {message.content && (
+                <button
+                  type="button"
+                  onClick={handleCopyMessage}
+                  className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200"
+                >
+                  {copiedMsg ? (
+                    <Check className="h-3 w-3 text-emerald-500" />
+                  ) : (
+                    <Copy className="h-3 w-3" />
+                  )}
+                  <span>{copiedMsg ? 'Copied' : 'Copy'}</span>
+                </button>
+              )}
 
-            {(isLastAssistant || message.status === 'error') && !isStreamingAny && (
-              <button
-                type="button"
-                onClick={() => onRegenerate(message.id)}
-                className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200"
-              >
-                <RefreshCw className="h-3 w-3" />
-                <span>{message.status === 'error' ? 'Retry' : 'Regenerate'}</span>
-              </button>
+              {message.content && (
+                <span className="font-mono text-[10px] text-slate-400 dark:text-slate-500">
+                  {countCharactersAndWords(message.content).chars} chars · {countCharactersAndWords(message.content).words} words
+                </span>
+              )}
+
+              {(isLastAssistant || message.status === 'error') && !isStreamingAny && (
+                <button
+                  type="button"
+                  onClick={() => onRegenerate(message.id)}
+                  className="flex items-center gap-1 rounded-md px-1.5 py-0.5 text-slate-500 transition-colors hover:bg-slate-200/60 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-white/8 dark:hover:text-slate-200 ml-auto"
+                >
+                  <RefreshCw className="h-3 w-3" />
+                  <span>{message.status === 'error' ? 'Retry' : 'Regenerate'}</span>
+                </button>
+              )}
+            </div>
+
+            {/* Quick Refinement Pills for Job Applications */}
+            {isLastAssistant && !isStreamingAny && onRefine && message.content && (
+              <div className="flex flex-wrap items-center gap-1 pt-0.5">
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mr-0.5">Refine:</span>
+                <button
+                  type="button"
+                  onClick={() => onRefine(REFINEMENT_PROMPTS.shorter)}
+                  title="Make answer shorter (under 100 words)"
+                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:bg-sky-500/15 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                >
+                  <Zap className="h-2.5 w-2.5 text-amber-500" />
+                  <span>Shorter</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRefine(REFINEMENT_PROMPTS.detailed)}
+                  title="Add more technical and impact details"
+                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:bg-sky-500/15 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                >
+                  <FileText className="h-2.5 w-2.5 text-blue-500" />
+                  <span>Detailed</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRefine(REFINEMENT_PROMPTS.formal)}
+                  title="Make tone formal and executive"
+                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:bg-sky-500/15 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                >
+                  <Briefcase className="h-2.5 w-2.5 text-indigo-500" />
+                  <span>Formal</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRefine(REFINEMENT_PROMPTS.star)}
+                  title="Format as Situation, Task, Action, Result"
+                  className="inline-flex items-center gap-1 rounded-md bg-slate-100 dark:bg-white/5 px-1.5 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300 hover:bg-sky-500/15 hover:text-sky-600 dark:hover:text-sky-400 transition-colors"
+                >
+                  <Star className="h-2.5 w-2.5 text-amber-400" />
+                  <span>STAR Format</span>
+                </button>
+              </div>
             )}
           </div>
         )}
