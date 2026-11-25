@@ -4,7 +4,12 @@ import { AlertCircle, Briefcase, Check, Copy, FileText, RefreshCw, Star, Zap } f
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import vibhaAvatar from '../../resources/icons/icon.png';
-import { countCharactersAndWords, REFINEMENT_PROMPTS } from '../services/profilePromptService.ts';
+import { FormAnswerSheet } from './profile/FormAnswerSheet.tsx';
+import {
+  countCharactersAndWords,
+  parseFormAnswerSheet,
+  REFINEMENT_PROMPTS,
+} from '../services/profilePromptService.ts';
 import type { UIMessage } from '../types/index.ts';
 
 interface MessageBubbleProps {
@@ -13,6 +18,7 @@ interface MessageBubbleProps {
   isStreamingAny: boolean;
   onRegenerate: (assistantMessageId: string) => void;
   onRefine?: (refinementPrompt: string) => void;
+  onInsertAnswer?: (text: string) => void;
 }
 
 const CodeBlock: React.FC<{ className?: string; children?: React.ReactNode }> = ({
@@ -78,8 +84,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
   isStreamingAny,
   onRegenerate,
   onRefine,
+  onInsertAnswer,
 }) => {
   const [copiedMsg, setCopiedMsg] = useState(false);
+
+  const formCards = useMemo(() => {
+    if (message.role === 'assistant' && message.status !== 'streaming' && message.content) {
+      return parseFormAnswerSheet(message.content);
+    }
+    return null;
+  }, [message.role, message.status, message.content]);
 
   const handleCopyMessage = async () => {
     if (!message.content) return;
@@ -158,6 +172,12 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
               </div>
               <span className="text-[11px] text-slate-400">Thinking...</span>
             </div>
+          ) : formCards && formCards.length >= 2 ? (
+            <FormAnswerSheet
+              cards={formCards}
+              onInsertAnswer={onInsertAnswer}
+              onRefineQuestion={(_index, prompt) => onRefine?.(prompt)}
+            />
           ) : (
             <div className="prose prose-sm max-w-none break-words text-slate-800 dark:prose-invert dark:text-slate-100 [&>p]:my-1.5 [&>p:first-child]:mt-0 [&>p:last-child]:mb-0 [&>ul]:my-1.5 [&>ul]:list-disc [&>ul]:pl-4 [&>ol]:my-1.5 [&>ol]:list-decimal [&>ol]:pl-4 [&>h1]:text-sm [&>h1]:font-semibold [&>h2]:text-[13px] [&>h2]:font-semibold [&>h3]:text-[13px] [&>h3]:font-medium">
               <ReactMarkdown
@@ -229,7 +249,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = ({
             </div>
 
             {/* Quick Refinement Pills for Job Applications */}
-            {isLastAssistant && !isStreamingAny && onRefine && message.content && (
+            {!formCards && isLastAssistant && !isStreamingAny && onRefine && message.content && (
               <div className="flex flex-wrap items-center gap-1 pt-0.5">
                 <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium mr-0.5">Refine:</span>
                 <button

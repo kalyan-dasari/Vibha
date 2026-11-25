@@ -17,6 +17,7 @@ interface MessageListProps {
   onOpenQuickVault?: () => void;
   onStartFormCopilot?: () => void;
   onRefine?: (refinementPrompt: string) => void;
+  onInsertAnswer?: (text: string) => void;
   onQuickPrompt?: (prompt: string) => void;
 }
 
@@ -33,6 +34,7 @@ export const MessageList: React.FC<MessageListProps> = ({
   onOpenQuickVault,
   onStartFormCopilot,
   onRefine,
+  onInsertAnswer,
   onQuickPrompt,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -181,6 +183,7 @@ export const MessageList: React.FC<MessageListProps> = ({
           isStreamingAny={isStreaming}
           onRegenerate={onRegenerate}
           onRefine={onRefine}
+          onInsertAnswer={onInsertAnswer}
         />
       ))}
       <div ref={bottomRef} />
