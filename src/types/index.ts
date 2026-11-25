@@ -14,4 +14,4 @@ export interface UIMessage {
   model?: string;
 }
 
-export type SettingsTabId = 'general' | 'providers' | 'capture' | 'about';
+export type SettingsTabId = 'general' | 'providers' | 'capture' | 'profile' | 'about';

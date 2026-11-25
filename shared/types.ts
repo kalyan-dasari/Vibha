@@ -179,6 +179,85 @@ export interface WindowMovePayload {
   deltaY: number;
 }
 
+export interface ProfilePersonal {
+  fullName: string;
+  email: string;
+  phone: string;
+  location: string;
+  linkedIn: string;
+  github: string;
+  portfolio: string;
+  title: string;
+  summary: string;
+}
+
+export interface ProfileEducation {
+  id: string;
+  degree: string;
+  institution: string;
+  fieldOfStudy: string;
+  graduationYear: string;
+  gpa?: string;
+  highlights?: string;
+}
+
+export interface ProfileExperience {
+  id: string;
+  role: string;
+  company: string;
+  location?: string;
+  startDate: string;
+  endDate: string;
+  isCurrent: boolean;
+  highlights: string;
+}
+
+export interface ProfileSkills {
+  technical: string[];
+  frameworks: string[];
+  tools: string[];
+  soft: string[];
+}
+
+export interface ProfileProject {
+  id: string;
+  title: string;
+  role?: string;
+  techStack: string[];
+  link?: string;
+  description: string;
+  highlights?: string;
+}
+
+export interface ProfileLogistics {
+  workAuthorization: string;
+  noticePeriod: string;
+  salaryExpectations: string;
+  relocation: string;
+  remotePreference: string;
+  veteranStatus?: string;
+  disabilityStatus?: string;
+}
+
+export interface ProfileSnippet {
+  id: string;
+  title: string;
+  category: 'behavioral' | 'bio' | 'general' | 'qa';
+  content: string;
+  tags: string[];
+}
+
+export interface PersonalProfile {
+  personal: ProfilePersonal;
+  education: ProfileEducation[];
+  experience: ProfileExperience[];
+  skills: ProfileSkills;
+  projects: ProfileProject[];
+  logistics: ProfileLogistics;
+  snippets: ProfileSnippet[];
+  updatedAt: number;
+}
+
 export interface FloatingAIBridge {
   window: {
     setExpanded: (expanded: boolean) => Promise<void>;
@@ -212,5 +291,9 @@ export interface FloatingAIBridge {
     captureWindow: (payload: CaptureWindowPayload) => Promise<CaptureResponse>;
     captureArea: (displayId?: number) => Promise<CaptureResponse>;
     submitAreaSelection: (selection: CaptureAreaResult | null) => void;
+  };
+  profile: {
+    get: () => Promise<PersonalProfile>;
+    update: (partial: Partial<PersonalProfile>) => Promise<{ ok: boolean; profile: PersonalProfile; error?: string }>;
   };
 }
