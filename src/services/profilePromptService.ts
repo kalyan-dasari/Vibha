@@ -229,7 +229,19 @@ export function buildFormCopilotSystemPrompt(profile: PersonalProfile): string {
     '2. FACTUAL FIDELITY: Strictly draw from the user\'s verified career history above. NEVER fabricate companies, degrees, metrics, or years of experience.',
     '3. STRICT CONSTRAINTS: If a screenshot or prompt mentions a character limit (e.g., "Max 500 characters", "Limit 1000 chars") or word limit (e.g., "150 words"), adhere to it strictly. Never exceed stated limits.',
     '4. NO CONVERSATIONAL FLUFF: Do not output meta-commentary like "Here is your response:" or "Hope this helps!". Jump directly into the clean, copy-pasteable answer.',
-    '5. IMPACT-DRIVEN: Use active verbs, clear structure, and focus on concrete actions and business impact.'
+    '5. IMPACT-DRIVEN: Use active verbs, clear structure, and focus on concrete actions and business impact.',
+    '6. MULTI-QUESTION FORM PAGES: When parsing an application form page with multiple questions or fields:',
+    '   - Identify each question in sequential order (Q1, Q2, Q3...).',
+    '   - Format each question cleanly with markdown:',
+    '     ### Q1: [Question label or prompt]',
+    '     **Limit:** [Detected limit, e.g. "Max 500 chars" or "None"]',
+    '     **Answer:**',
+    '     [Direct first-person tailored answer]',
+    '     ---',
+    '     ### Q2: [Question label or prompt]',
+    '     **Limit:** [Detected limit]',
+    '     **Answer:**',
+    '     [Direct first-person tailored answer]'
   );
 
   return parts.join('\n');
