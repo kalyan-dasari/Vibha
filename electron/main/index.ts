@@ -3,8 +3,10 @@ import { app, ipcMain, safeStorage } from 'electron';
 import type { WindowExpandPayload, WindowMovePayload } from '../../shared/types.ts';
 import { registerCaptureHandlers } from '../ipc/captureHandlers.ts';
 import { registerChatHandlers } from '../ipc/chatHandlers.ts';
+import { registerProfileHandlers } from '../ipc/profileHandlers.ts';
 import { registerSettingsHandlers } from '../ipc/settingsHandlers.ts';
 import { ProviderFactory } from '../services/ai/ProviderFactory.ts';
+import { ProfileService } from '../services/profile/profileService.ts';
 import { CaptureService } from '../services/screen/captureService.ts';
 import { MonitorService } from '../services/screen/monitorService.ts';
 import { CredentialService } from '../services/security/credentialService.ts';
@@ -17,6 +19,7 @@ import { WindowManager } from './windowManager.ts';
 function bootstrap(): void {
   const userDataDir = app.getPath('userData');
   const settingsService = new SettingsService(userDataDir);
+  const profileService = new ProfileService(userDataDir);
   const credentialService = new CredentialService(userDataDir, safeStorage);
   const providerFactory = new ProviderFactory(credentialService);
   const monitorService = new MonitorService();
@@ -88,6 +91,7 @@ function bootstrap(): void {
       lifecycleManager,
     });
     registerCaptureHandlers({ captureService, settingsService });
+    registerProfileHandlers({ profileService });
 
     const trayService = new TrayService({
       windowManager,

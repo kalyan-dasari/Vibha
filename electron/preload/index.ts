@@ -63,6 +63,10 @@ const floatingAIBridge: FloatingAIBridge = {
       ipcRenderer.send('capture:submit-area', selection);
     },
   },
+  profile: {
+    get: () => ipcRenderer.invoke('profile:get'),
+    update: (partial) => ipcRenderer.invoke('profile:update', partial),
+  },
 };
 
 contextBridge.exposeInMainWorld('floatingAI', floatingAIBridge);
