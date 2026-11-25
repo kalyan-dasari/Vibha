@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black" alt="React 19" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?logo=typescript&logoColor=white" alt="TypeScript" />
   <img src="https://img.shields.io/badge/TailwindCSS-v4-38B2AC?logo=tailwindcss&logoColor=white" alt="Tailwind CSS v4" />
-  <img src="https://img.shields.io/badge/Tests-41%2F41%20Passed-emerald" alt="Tests: 41/41 Passed" />
+  <img src="https://img.shields.io/badge/Tests-46%2F46%20Passed-emerald" alt="Tests: 46/46 Passed" />
 </p>
 
 ---
@@ -58,6 +58,7 @@ Vibha operates strictly on a **Bring Your Own Key (BYOK)** model. You use your o
   - **Form Copilot Mode**: Toggle Form Copilot mode anytime to automatically cross-reference your career background and enforce strict adherence to detected character or word limits without conversational fluff.
   - **Live Character & Word Counters**: Telemetry displayed on generated answers (`{chars} chars · {words} words`) so you immediately know if an answer fits within strict application field limits.
   - **1-Click Refinement Actions**: Quickly adjust any drafted response with presets: `[⚡ Shorter]` (<100 words), `[📝 Detailed]` (add technical impact), `[💼 More Formal]` (executive tone), or `[⭐ STAR Format]` (Situation, Task, Action, Result).
+  - **Multi-Question Form Answer Sheet**: Capture entire application pages with 3–5 behavioral questions and click `[📋 Parse Full Form]`. Vibha parses all questions simultaneously into separate interactive cards with individual `[📋 Copy Answer]` buttons, telemetry, and a bulk `[📋 Copy All]` action.
 
 ---
 
