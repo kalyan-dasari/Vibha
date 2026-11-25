@@ -15,6 +15,8 @@ interface MessageListProps {
   onOpenSettings: () => void;
   onOpenCapture: () => void;
   onOpenQuickVault?: () => void;
+  onStartFormCopilot?: () => void;
+  onRefine?: (refinementPrompt: string) => void;
   onQuickPrompt?: (prompt: string) => void;
 }
 
@@ -29,6 +31,8 @@ export const MessageList: React.FC<MessageListProps> = ({
   onOpenSettings,
   onOpenCapture,
   onOpenQuickVault,
+  onStartFormCopilot,
+  onRefine,
   onQuickPrompt,
 }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -96,6 +100,17 @@ export const MessageList: React.FC<MessageListProps> = ({
                 <Camera className="h-3.5 w-3.5 text-sky-500" />
                 <span>Capture Screen</span>
               </button>
+
+              {onStartFormCopilot && (
+                <button
+                  type="button"
+                  onClick={onStartFormCopilot}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-indigo-200/90 bg-indigo-50/80 px-3 py-1.5 text-xs font-semibold text-indigo-700 shadow-sm transition-all hover:border-indigo-400 hover:bg-indigo-100 hover:text-indigo-800 dark:border-indigo-500/30 dark:bg-indigo-500/15 dark:text-indigo-300 dark:hover:bg-indigo-500/25 active:scale-[0.97]"
+                >
+                  <Sparkles className="h-3.5 w-3.5 text-indigo-500" />
+                  <span>Form Copilot</span>
+                </button>
+              )}
 
               {onOpenQuickVault && (
                 <button
@@ -165,6 +180,7 @@ export const MessageList: React.FC<MessageListProps> = ({
           isLastAssistant={msg.id === lastAssistantId}
           isStreamingAny={isStreaming}
           onRegenerate={onRegenerate}
+          onRefine={onRefine}
         />
       ))}
       <div ref={bottomRef} />

@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { cancelChatStream, dispatchChatStream } from '../services/chatService.ts';
 import { getBridge } from '../services/electronBridge.ts';
+import { buildFormCopilotSystemPrompt } from '../services/profilePromptService.ts';
 import { useChatStore } from '../stores/chatStore.ts';
 import { useSettingsStore } from '../stores/settingsStore.ts';
 
@@ -10,6 +11,7 @@ export function useChat() {
   const isStreaming = useChatStore((s) => s.isStreaming);
   const activeRequestId = useChatStore((s) => s.activeRequestId);
   const error = useChatStore((s) => s.error);
+  const formAssistantMode = useChatStore((s) => s.formAssistantMode);
 
   const addPendingAttachment = useChatStore((s) => s.addPendingAttachment);
   const removePendingAttachment = useChatStore((s) => s.removePendingAttachment);
@@ -22,6 +24,8 @@ export function useChat() {
   const cancelActiveStream = useChatStore((s) => s.cancelActiveStream);
   const clearConversation = useChatStore((s) => s.clearConversation);
   const clearError = useChatStore((s) => s.clearError);
+  const setFormAssistantMode = useChatStore((s) => s.setFormAssistantMode);
+  const toggleFormAssistantMode = useChatStore((s) => s.toggleFormAssistantMode);
 
   const snapshot = useSettingsStore((s) => s.snapshot);
   const modelsByProvider = useSettingsStore((s) => s.modelsByProvider);
@@ -48,7 +52,10 @@ export function useChat() {
   }, [appendStreamDelta, completeStream, failStream]);
 
   const sendMessage = useCallback(
-    async (rawText: string): Promise<boolean> => {
+    async (
+      rawText: string,
+      options?: { isFormAssistant?: boolean; systemPrompt?: string }
+    ): Promise<boolean> => {
       const content = rawText.trim();
       if (!content && pendingAttachments.length === 0) return false;
       if (isStreaming) return false;
@@ -87,12 +94,28 @@ export function useChat() {
 
       const currentMessages = useChatStore.getState().messages.slice(0, -1);
 
+      // Build system prompt with personal profile if in Form Copilot mode
+      let systemPrompt = options?.systemPrompt;
+      const isFormCopilot = options?.isFormAssistant ?? formAssistantMode;
+      if (isFormCopilot && !systemPrompt) {
+        const bridge = getBridge();
+        if (bridge?.profile) {
+          try {
+            const profile = await bridge.profile.get();
+            systemPrompt = buildFormCopilotSystemPrompt(profile);
+          } catch {
+            // Fallback to default
+          }
+        }
+      }
+
       const res = await dispatchChatStream({
         requestId,
         provider,
         model,
         messages: currentMessages,
         supportsVisionOverride,
+        systemPrompt,
       });
 
       if (!res.accepted) {
@@ -105,6 +128,7 @@ export function useChat() {
     [
       beginTurn,
       failStream,
+      formAssistantMode,
       isStreaming,
       modelsByProvider,
       pendingAttachments,
@@ -147,12 +171,27 @@ export function useChat() {
           ? providerConfig.customModelSupportsVision
           : knownModel?.supportsVision;
 
+      // Build system prompt with personal profile if in Form Copilot mode
+      let systemPrompt: string | undefined;
+      if (formAssistantMode) {
+        const bridge = getBridge();
+        if (bridge?.profile) {
+          try {
+            const profile = await bridge.profile.get();
+            systemPrompt = buildFormCopilotSystemPrompt(profile);
+          } catch {
+            // Fallback
+          }
+        }
+      }
+
       const res = await dispatchChatStream({
         requestId,
         provider,
         model,
         messages: contextMessages,
         supportsVisionOverride,
+        systemPrompt,
       });
 
       if (!res.accepted) {
@@ -162,6 +201,7 @@ export function useChat() {
     [
       beginRegenerateTurn,
       failStream,
+      formAssistantMode,
       isStreaming,
       modelsByProvider,
       snapshot.settings.activeProvider,
@@ -169,15 +209,26 @@ export function useChat() {
     ]
   );
 
+  const refineLastMessage = useCallback(
+    async (refinementPrompt: string): Promise<boolean> => {
+      return sendMessage(refinementPrompt);
+    },
+    [sendMessage]
+  );
+
   return {
     messages,
     pendingAttachments,
     isStreaming,
     error,
+    formAssistantMode,
+    setFormAssistantMode,
+    toggleFormAssistantMode,
     addPendingAttachment,
     removePendingAttachment,
     clearPendingAttachments,
     sendMessage,
+    refineLastMessage,
     stopGeneration,
     regenerateMessage,
     clearConversation,

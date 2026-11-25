@@ -60,6 +60,9 @@ interface ChatPanelProps {
   onMinimize: () => void;
   onCollapse: () => void;
   onBrowserDragDelta?: (dx: number, dy: number) => void;
+  formAssistantActive?: boolean;
+  onToggleFormAssistant?: () => void;
+  onRefine?: (refinementPrompt: string) => void;
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({
@@ -98,6 +101,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
   onMinimize,
   onCollapse,
   onBrowserDragDelta,
+  formAssistantActive,
+  onToggleFormAssistant,
+  onRefine,
 }) => {
   const [captureMenuOpen, setCaptureMenuOpen] = useState(false);
   const [quickVaultOpen, setQuickVaultOpen] = useState(false);
@@ -198,12 +204,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               activeModel={activeModel}
               shortcut={snapshot.settings.globalShortcut}
               onRegenerate={onRegenerate}
+              onRefine={onRefine}
               onOpenSettings={() => {
                 onChangeSettingsTab('providers');
                 if (!settingsOpen) onToggleSettings();
               }}
               onOpenCapture={() => setCaptureMenuOpen(true)}
               onOpenQuickVault={() => setQuickVaultOpen(true)}
+              onStartFormCopilot={() => {
+                if (!formAssistantActive) onToggleFormAssistant?.();
+                void onCaptureArea();
+              }}
               onQuickPrompt={(prompt) => {
                 void onSend(prompt);
               }}
@@ -213,6 +224,12 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               attachments={pendingAttachments}
               onRemove={onRemoveAttachment}
               onRecapture={() => setCaptureMenuOpen(true)}
+              onAnswerWithProfile={() => {
+                if (!formAssistantActive) onToggleFormAssistant?.();
+                void onSend(
+                  'Answer the question shown in this form screenshot using my verified career and personal profile. Adhere strictly to any visible character or word limits.'
+                );
+              }}
             />
 
             <CaptureMenu
@@ -239,6 +256,8 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({
               onStop={onStop}
               insertedText={insertedText}
               onClearInsertedText={() => setInsertedText(null)}
+              formAssistantActive={formAssistantActive}
+              onToggleFormAssistant={onToggleFormAssistant}
             />
           </>
         )}
