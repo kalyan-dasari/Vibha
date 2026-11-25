@@ -11,10 +11,96 @@ export const REFINEMENT_PROMPTS = {
     'Restructure the previous answer into a clear STAR format (Situation, Task, Action, Result) using my verified experience.',
 } as const;
 
+export const MULTI_QUESTION_FORM_PROMPT =
+  'Parse this job application form page. Detect all form questions and input fields in the screenshot, and output a structured Form Answer Sheet with separate tailored answers derived from my verified profile. Include any detected character/word limits for each.';
+
+export interface FormQuestionCard {
+  id: string;
+  index: number;
+  question: string;
+  limit?: string;
+  answer: string;
+  chars: number;
+  words: number;
+}
+
 export function countCharactersAndWords(text: string): { chars: number; words: number } {
   const chars = text.length;
   const words = text.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
   return { chars, words };
+}
+
+export function formatAllAnswersForClipboard(cards: FormQuestionCard[]): string {
+  return cards
+    .map((card) => {
+      const header = `Q${card.index}: ${card.question}${card.limit ? ' (' + card.limit + ')' : ''}`;
+      return `${header}\n${card.answer}`;
+    })
+    .join('\n\n---\n\n');
+}
+
+/**
+ * Parses markdown text to detect if it contains a structured multi-question Form Answer Sheet.
+ * Matches sections delimited by ### Q1:, ### Question 1:, ### 1., or #### Q1:
+ */
+export function parseFormAnswerSheet(markdownText: string): FormQuestionCard[] | null {
+  if (!markdownText || typeof markdownText !== 'string') return null;
+
+  // Split into sections by markdown heading matching Q1, Question 1, etc.
+  const regex = /(?:^|\n)#{2,4}\s+(?:Q(?:uestion)?\s*(\d+)[:.]?|(\d+)[.:])\s*([^\n]+)/gi;
+  const matches = [...markdownText.matchAll(regex)];
+
+  if (matches.length < 2) {
+    return null;
+  }
+
+  const cards: FormQuestionCard[] = [];
+
+  for (let i = 0; i < matches.length; i++) {
+    const match = matches[i];
+    const matchIndex = match.index ?? 0;
+    const qNum = parseInt(match[1] || match[2] || String(i + 1), 10);
+    const qTitle = (match[3] || '').trim();
+
+    // The body extends from the end of this match to the start of the next match (or end of string)
+    const bodyStart = matchIndex + match[0].length;
+    const bodyEnd = i + 1 < matches.length ? (matches[i + 1].index ?? markdownText.length) : markdownText.length;
+    let sectionBody = markdownText.slice(bodyStart, bodyEnd).trim();
+
+    // Strip trailing separator if present
+    sectionBody = sectionBody.replace(/---+$/, '').trim();
+
+    // Extract limit if present, e.g. **Limit:** Max 500 chars or *Limit:* ...
+    let limit: string | undefined;
+    const limitMatch = sectionBody.match(/(?:\*{1,2}|_)?Limit(?:\*{1,2}|_)?:?\s*([^\n]+)/i);
+    if (limitMatch) {
+      limit = limitMatch[1].replace(/[*_]/g, '').trim();
+      // Remove the limit line from answer body
+      sectionBody = sectionBody.replace(limitMatch[0], '').trim();
+    }
+
+    // Extract **Answer:** prefix if present
+    const answerMatch = sectionBody.match(/(?:\*{1,2}|_)?Answer(?:\*{1,2}|_)?:?\s*/i);
+    if (answerMatch && answerMatch.index !== undefined && answerMatch.index < 40) {
+      sectionBody = sectionBody.slice(answerMatch.index + answerMatch[0].length).trim();
+    }
+
+    const { chars, words } = countCharactersAndWords(sectionBody);
+
+    if (qTitle && sectionBody) {
+      cards.push({
+        id: `form-card-${qNum}-${i}`,
+        index: qNum,
+        question: qTitle,
+        limit,
+        answer: sectionBody,
+        chars,
+        words,
+      });
+    }
+  }
+
+  return cards.length >= 2 ? cards : null;
 }
 
 export function buildFormCopilotSystemPrompt(profile: PersonalProfile): string {
