@@ -45,9 +45,12 @@ function FloatingAIWidget() {
     pendingAttachments,
     isStreaming,
     error,
+    formAssistantMode,
+    toggleFormAssistantMode,
     addPendingAttachment,
     removePendingAttachment,
     sendMessage,
+    refineLastMessage,
     stopGeneration,
     regenerateMessage,
     clearConversation,
@@ -128,6 +131,9 @@ function FloatingAIWidget() {
             onCaptureArea={captureArea}
             onMinimize={() => void minimizeWindow()}
             onCollapse={() => void toggleExpanded(false)}
+            formAssistantActive={formAssistantMode}
+            onToggleFormAssistant={toggleFormAssistantMode}
+            onRefine={(prompt) => void refineLastMessage(prompt)}
           />
         ) : (
           <FloatingOrb
@@ -200,6 +206,9 @@ function FloatingAIWidget() {
               onMinimize={() => void minimizeWindow()}
               onCollapse={() => void toggleExpanded(false)}
               onBrowserDragDelta={handleBrowserDragDelta}
+              formAssistantActive={formAssistantMode}
+              onToggleFormAssistant={toggleFormAssistantMode}
+              onRefine={(prompt) => void refineLastMessage(prompt)}
             />
           ) : (
             <div className="flex flex-col items-center gap-3">

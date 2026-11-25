@@ -18,6 +18,7 @@ export async function dispatchChatStream(params: {
   model: string;
   messages: UIMessage[];
   supportsVisionOverride?: boolean;
+  systemPrompt?: string;
 }): Promise<{ accepted: boolean; error?: string }> {
   const bridge = getBridge();
   if (!bridge) {
@@ -34,6 +35,7 @@ export async function dispatchChatStream(params: {
     model: params.model,
     messages: toChatMessageInputs(params.messages),
     supportsVisionOverride: params.supportsVisionOverride,
+    systemPrompt: params.systemPrompt,
   };
 
   return bridge.chat.sendMessageStream(request);
