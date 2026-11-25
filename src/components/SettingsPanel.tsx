@@ -23,6 +23,7 @@ import type {
   TestConnectionPayload,
   TestConnectionResult,
 } from '../types/index.ts';
+import { ProfileSettingsView } from './profile/ProfileSettingsView.tsx';
 
 interface SettingsPanelProps {
   snapshot: SafeSettingsSnapshot;
@@ -179,8 +180,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-4 gap-1 rounded-lg bg-slate-100 p-1 dark:bg-white/5">
-          {(['general', 'providers', 'capture', 'about'] as SettingsTabId[]).map((tab) => (
+        <div className="grid grid-cols-5 gap-1 rounded-lg bg-slate-100 p-1 dark:bg-white/5">
+          {(['general', 'providers', 'capture', 'profile', 'about'] as SettingsTabId[]).map((tab) => (
             <button
               key={tab}
               type="button"
@@ -667,6 +668,8 @@ export const SettingsPanel: React.FC<SettingsPanelProps> = ({
             </div>
           </div>
         )}
+
+        {activeTab === 'profile' && <ProfileSettingsView />}
 
         {activeTab === 'about' && (
           <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
