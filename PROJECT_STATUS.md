@@ -3,7 +3,7 @@
 **Application Name:** Vibha (formerly Floating AI)  
 **Target Platform:** Windows 10 / 11 (Electron Desktop)  
 **Architecture:** Electron 45 (Main + Preload + Sandboxed ContextBridge) + React 19 + TypeScript + Tailwind CSS v4 + Zustand  
-**Status:** Phases 1–4 Complete · Tray & Shortcut Recovery Verified · All 27 Tests Passing  
+**Status:** Phases 1–4 Complete · Profile Vault (Phase 1) Implemented · All 31 Tests Passing  
 
 ---
 
@@ -43,6 +43,7 @@ All 4 development phases have been implemented and verified:
 | **Vibha Icon & Multi-Resolution Assets** | `resources/icons/*`, `scripts/generate-ico.ps1` | High-res avatar (`icon.png`), standard vector source (`icon.svg`), and multi-resolution Windows ICO (`icon.ico` with 256, 128, 64, 48, 32, 16px). Built into floating orb UI, chat header, tray, and app executable. |
 | **Robust App Lifecycle Guard** | `electron/main/appLifecycle.ts` | Defensively invokes `windowManager.setIsQuittingCallback` to prevent main process uncaught exceptions, ensuring reliable bootstrap across all build states. |
 | **Redesigned Chat UI & Avatar Transition** | `src/components/MessageList.tsx`, `ChatHeader.tsx`, `MessageBubble.tsx`, `ChatInput.tsx` | Front-and-center Vibha avatar with ambient halo on empty state, instant fade-out to conversation thread on start, interactive starter pills (capture, explain, summarize, code), mini avatar on assistant turns, and glassmorphic controls. |
+| **Personal Profile & Application Vault (Phase 1)** | `electron/services/profile/*`, `src/components/profile/*` | Local-first profile vault in `userData/profile.json` storing contact info, work experience, education, skills, projects, application logistics (work auth, salary, notice period), and custom Q&A snippets with instant 1-click clipboard copying. |
 | **BYOK Architecture & Local Setup Docs** | `README.md` | Comprehensive documentation covering Bring-Your-Own-Key model across Gemini, Groq, and OpenAI-compatible endpoints, local clone-and-run steps for others (`pnpm run dev:electron`), security architecture, and testing. |
 
 ---
@@ -52,7 +53,7 @@ All 4 development phases have been implemented and verified:
 | Check | Command | Status | Details |
 |---|---|---|---|
 | **TypeScript Typecheck** | `pnpm run lint` (`tsc --noEmit`) | **PASS** | 0 errors across main, preload, renderer, and test files. |
-| **Unit Test Suite** | `pnpm run test` (`vitest run`) | **PASS** | 27/27 tests passed across 6 suites (100% success rate). |
+| **Unit Test Suite** | `pnpm run test` (`vitest run`) | **PASS** | 31/31 tests passed across 7 suites (100% success rate). |
 | **Renderer Production Build** | `pnpm run build` (`vite build`) | **PASS** | Successfully bundled HTML/CSS/JS client into `dist/`. |
 | **Electron Main/Preload Build** | `pnpm run build:electron` | **PASS** | Successfully bundled CJS bundles into `dist-electron/`. |
 | **Desktop Launch Verification** | `pnpm run dev:electron` | **PASS** | Verified Electron boots with clean process environment, window opens, tray initializes. |
